@@ -1,0 +1,8 @@
+1.3
+----------
+* Relying on the existance of the Private_Tab addon to use its API.
+
+1.2.7
+----------
+* Updated hostname regexp to allow multiple suffix tags (ex/ foo.co.jp)
+* Added a menu item to block the current hostname to the right-click-context-menu
