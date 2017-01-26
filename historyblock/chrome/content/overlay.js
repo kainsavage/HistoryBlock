@@ -2,7 +2,5 @@
 // components.
 var historyblock;
 
-console.log(browser);
-
 // Fire that badboy off when the window is loaded.
 window.addEventListener("load",() => { historyblock = new HistoryBlock(); },false);
