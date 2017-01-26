@@ -5,6 +5,8 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="chrome://historyblock/content/historyblock.js" type="application/x-javascript"/>
   <script src="chrome://historyblock/content/SHA1.js" type="application/x-javascript"/>
+  <script src="chrome://historyblock/content/PrefObserver.js" type="application/x-javascript"/>
+  <script src="chrome://historyblock/content/psl.js" type="application/x-javascript"/>
   <script src="chrome://historyblock/content/overlay.js" type="application/x-javascript"/>
   
   <stringbundleset id="stringbundleset">
