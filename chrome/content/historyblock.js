@@ -27,7 +27,16 @@ class HistoryBlock {
 
       this.domainstring = prefs.getCharPref("extensions.historyblock.stringpref");
 
-      // window.addEventListener("DOMWindowClose", event => { /* TODO */ }, false);
+      // This actually cannot be done until HB is a web extension, and that cannot be done until
+      // the session store API is ported. The problem is that when this is fired, the context of
+      // that window includes this HB instance, so using setTimeout, for example, fails the moment
+      // the window is actually closed as it is 'deleted'.
+      // Web extensions have the notion of a "background" script which is long-lived across many
+      // windows, which would make this process trivial; however, there is nothing equivalent to
+      // sessionStore yet implemented and `Components.classes` is hard-deprecated, so there is no
+      // way to forget a closed tab (let alone a window) with the rewrite to be a web extension.
+      //window.addEventListener("DOMWindowClose", event => this.windowClosed(event), false);
+
       gBrowser.tabContainer.addEventListener("TabClose", event => this.tabClosed(event), true);
       gBrowser.addTabsProgressListener({ onStateChange: 
         (aBrowser, aWebProgress, aRequest, aStateFlag, aStatus) => { 
