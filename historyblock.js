@@ -49,10 +49,10 @@ class HistoryBlock {
    * session to forget about that closed tab, thus removing it from the 
    * recently closed tabs list.
    *
-   * @param tabId (integer)
+   * @param {integer} tabId
    *        The identifier of the tab before it was closed. Note: tabs that are
    *        closed lose their tabId, so this value is useless.
-   * @param removeInfo (object)
+   * @param {object} removeInfo
    *        Metadata about the removed tab.
    */
   async onTabRemoved(tabId, removeInfo) {
@@ -75,7 +75,7 @@ class HistoryBlock {
    * blacklist, then tell the session to forget about that closed window, thus
    * removing it from the recently closed windows list.
    *
-   * @param windowId (integer)
+   * @param {integer} windowId
    *        The identifier of the window before it was closed. Note: windows 
    *        that are closed lose their windowId, so this value is useless.
    */
@@ -98,7 +98,7 @@ class HistoryBlock {
    * the domain name of the url of this visit exists in the HistoryBlock 
    * blacklist, then remove the url from the history.
    *
-   * @param info (object)
+   * @param {object} info
    *        The data about the visit.
    */
   async onPageVisited(info) {
@@ -108,7 +108,7 @@ class HistoryBlock {
   /**
    * Attempts to remove the given url from the browser history.
    *
-   * @param url (string)
+   * @param {string} url
    *        The url to remove from the browser history.
    */
   async removeHistory(url) {
@@ -119,9 +119,9 @@ class HistoryBlock {
    * Called when one of the context menu items is clicked. Largely this is just
    * a router for the different types of context menu clicks.
    *
-   * @param info (object)
+   * @param {object} info
    *        The data about the context menu click.
-   * @param tab (object)
+   * @param {object} tab
    *        The tab in which the context menu click occurred.
    */
   async onContextMenuItemClicked(info, tab) {
@@ -151,9 +151,9 @@ class HistoryBlock {
   /**
    * Attempts to blacklist the domain name of the url of the given tab.
    *
-   * @param info (object)
+   * @param {object} info
    *        Information about the context menu click. Note: this is ignored.
-   * @param tab (object)
+   * @param {object} tab
    *        The tab in which the context menu 'block' click occurred.
    */
   async block(info, tab) {
@@ -177,9 +177,9 @@ class HistoryBlock {
   /**
    * Attempts to unblacklist the domain name of the url of the given tab.
    *
-   * @param info (object)
+   * @param {object} info
    *        Information about the context menu click. Note: this is ignored.
-   * @param tab (object)
+   * @param {object} tab
    *        The tab in which the context menu 'unblock' click occurred.
    */
   async unblock(info, tab) {
@@ -205,7 +205,7 @@ class HistoryBlock {
    *   https://foo.bar.baz.google.com/ -> google.com
    *   http://www.google.co.uk/ -> google.co.uk
    *
-   * @param url (string)
+   * @param {string} url
    *        The url for which the domain name should be returned.
    */
   getDomainName(url) {
