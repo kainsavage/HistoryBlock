@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "HistoryBlock"
+  },
+  "extensionDescription": {
+    "message": "Cover your tracks!"
+  },
+  "block": {
+    "message": "Block"
+  },
+  "unblock": {
+    "message": "Unblock"
+  }
+}
