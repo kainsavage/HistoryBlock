@@ -1,26 +1,22 @@
 /**
- * The SHA1 library.
+ * A lightweight SHA1 library built on top of the browser's crypto object.
  */
-
 class SHA1 {
 	constructor() {
+    // Deliberately empty.
 	}
 
   /**
    * Digests the given string into the hex-encoded SHA1 hash.
+   *
+   * @param {string} str
+   *        The string to be digested.
    */
-  digest(str) {
-    let buffer = new TextEncoder("utf-8").encode(str);
+  async digest(str) {
+    let encoded = new TextEncoder("utf-8").encode(str);
 
-    return crypto.subtle.digest("SHA-1", buffer).then( (hash) => {
-      return this.hex(hash);
-    });
-  }
+    let buffer = await crypto.subtle.digest("SHA-1", encoded);
 
-  /**
-   * Only to be used internally.
-   */
-  hex(buffer) {
     let hexCodes = [];
     let view = new DataView(buffer);
     for (let i = 0; i < view.byteLength; i += 4) {
