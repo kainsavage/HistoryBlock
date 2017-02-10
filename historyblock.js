@@ -41,6 +41,19 @@ class HistoryBlock {
     chrome.contextMenus.onClicked.addListener(
       (info, tab) => this.onContextMenuItemClicked(info, tab)
     );
+
+    browser.runtime.onMessage.addListener( (message) => this.onMessage(message) );
+  }
+
+  /**
+   *
+   */
+  async onMessage(message) {
+    switch(message.action) {
+      case "addToBlacklist":
+        this.block(message.url);
+        break;
+    }
   }
 
   /**
@@ -127,9 +140,9 @@ class HistoryBlock {
   async onContextMenuItemClicked(info, tab) {
     switch(info.menuItemId) {
       case "blockthis":
-        return this.block(info, tab);
+        return this.block(tab.url);
       case "unblockthis":
-        return this.unblock(info, tab);
+        return this.unblock(tab.url);
     }
   }
 
@@ -140,7 +153,7 @@ class HistoryBlock {
     let storage = await browser.storage.sync.get();
 
     if(!storage.blacklist) {
-      await browser.storage.sync.set({blacklist:''});
+      await browser.storage.sync.set({blacklist:[]});
 
       storage = await browser.storage.sync.get();
     }
@@ -149,27 +162,24 @@ class HistoryBlock {
   }
 
   /**
-   * Attempts to blacklist the domain name of the url of the given tab.
+   * Attempts to blacklist the domain name of the given url.
    *
-   * @param {object} info
-   *        Information about the context menu click. Note: this is ignored.
-   * @param {object} tab
-   *        The tab in which the context menu 'block' click occurred.
+   * @param {string} url
+   *        The url to add to the blacklist.
    */
-  async block(info, tab) {
-    let domain = this.getDomainName(tab.url);
+  async block(url) {
+    let domain = this.getDomainName(url);
 
     if(domain) {
       let hash = await this.hash.digest(domain);
       let blacklist = await this.getBlacklist();
 
       if(!blacklist.includes(hash)) {
-        if(blacklist.split(',').indexOf("") === -1) {
-          blacklist += ",";
-        }
-        blacklist += hash;
+        blacklist.push(hash);
 
         browser.storage.sync.set({blacklist:blacklist});
+
+        let test = await browser.storage.sync.get();
       }
     }
   }
@@ -177,22 +187,18 @@ class HistoryBlock {
   /**
    * Attempts to unblacklist the domain name of the url of the given tab.
    *
-   * @param {object} info
-   *        Information about the context menu click. Note: this is ignored.
-   * @param {object} tab
-   *        The tab in which the context menu 'unblock' click occurred.
+   * @param {string} url
+   *        The url to remove from the blacklist.
    */
-  async unblock(info, tab) {
-    let domain = this.getDomainName(tab.url);
+  async unblock(url) {
+    let domain = this.getDomainName(url);
 
     if(domain) {
       let hash = await this.hash.digest(domain);
       let blacklist = await this.getBlacklist();
 
       if(blacklist.includes(hash)) {
-        blacklist = blacklist.replace(',' + hash, "");
-        blacklist = blacklist.replace(hash + ',', "");
-        blacklist = blacklist.replace(hash, "");
+        blacklist.splice(blacklist.indexOf(hash), 1);
 
         browser.storage.sync.set({blacklist:blacklist});
       }
