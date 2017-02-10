@@ -62,7 +62,11 @@ class Options {
   }
 
   /**
+   * Fired when a message is received from another extension or background 
+   * script.
    *
+   * @param {string} message
+   *        The message.
    */
   async onMessage(message) {
     switch(message.action) {
@@ -73,28 +77,37 @@ class Options {
   }
 
   /**
-   *
+   * Sends a message to have HistoryBlock clear the blacklist.
    */
   async resetBlacklist() {
     return browser.runtime.sendMessage({action: 'clearBlacklist'});
   }
 
   /**
+   * Sends a message to have HistoryBlock add the given URL to the blacklist.
    *
+   * @param {string} url
+   *        The URL to add to the blacklist.
    */
   async addToBlacklist(url) {
     return browser.runtime.sendMessage({action: 'addToBlacklist', url: url});
   }
 
   /**
+   * Sends a message to have HistoryBlock remove the given URL from the blacklist.
    *
+   * @param {string} url
+   *        The URL to remove from the blacklist.
    */
   async removeFromBlacklist(url) {
     return browser.runtime.sendMessage({action: 'removeFromBlacklist', url: url});
   }
 
   /**
+   * Sends a message to have HistoryBlock change the blacklist encryption type.
    *
+   * @param {string} type
+   *        The type of encryption to use on blacklist entries.
    */
   async changeBlacklistType(type) {
     await browser.runtime.sendMessage({action: 'changeBlacklistType', type: type});
@@ -102,6 +115,12 @@ class Options {
     return this.resetBlacklist();
   }
 
+  /**
+   * Sends a message to have HistoryBlock change the matching technique.
+   *
+   * @param {string} matching
+   *        The technique of matching to use on URLs.
+   */
   async changeBlacklistMatching(matching) {
     await browser.runtime.sendMessage({action: 'changeBlacklistMatching', matching: matching});
 
@@ -109,7 +128,7 @@ class Options {
   }
 
   /**
-   *
+   * Renders the blacklist encryption type controls.
    */
   async renderBlacklistType() {
     let storage = await browser.storage.sync.get();
@@ -129,7 +148,7 @@ class Options {
   }
 
   /**
-   *
+   * Renders the blacklist matching technique controls.
    */
   async renderBlacklistMatching() {
     let storage = await browser.storage.sync.get();
@@ -149,7 +168,7 @@ class Options {
   }
 
   /**
-   *
+   * Renders the blacklist.
    */
   async renderBlacklist() {
     let storage = await browser.storage.sync.get();
