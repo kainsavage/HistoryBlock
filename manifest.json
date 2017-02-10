@@ -32,7 +32,12 @@
   "background": {
     "scripts": [
       "libraries/psl.js",
+      "libraries/NoHash.js",
       "libraries/SHA1.js",
+      "libraries/Matcher.js",
+      "libraries/DomainMatcher.js",
+      "libraries/SubdomainMatcher.js",
+      "libraries/URLMatcher.js",
       "historyblock.js"
     ]
   },

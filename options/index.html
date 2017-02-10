@@ -10,12 +10,32 @@
   </head>
 
 <body>
-  <h3>Blacklist</h3>
+  <row>
+    <name>Encryption</name>
+    <inputs id="blacklisttype">
+      <label><input type="radio" name="type" value="sha1"></input> SHA1</label>
+      <label><input type="radio" name="type" value="none"></input> None</label>
+    </inputs>
+  </row>
+  <row>
+    <name>Matching</name>
+    <inputs id="blacklistmatching">
+      <label><input type="radio" name="matching" value="domain"></input> Domain</label>
+      <label><input type="radio" name="matching" value="subdomain"></input> Subdomain</label>
+      <label><input type="radio" name="matching" value="url"></input> Full URL</label>
+    </inputs>
+  </row>
+  <row>
+    <name>Blacklist</name>
+  </row>
   <div id="blacklistcontainer">
     <ul id="blacklist"></ul>
   </div>
-  <button id="resetBlacklist">Reset Blacklist</button>
+  <button id="resetBlacklist">Clear Blacklist</button>
+  <button id="removeFromBlacklist">Remove Domain</button>
   <button id="addToBlacklist">Add Domain</button>
+
+  <h3>
 </body>
 
 </html>

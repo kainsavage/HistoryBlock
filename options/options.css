@@ -22,13 +22,24 @@ button:hover {
   background-color: #ebebeb;
 }
 
-h3 {
+row {
+  display: block;
   border-bottom: 1px solid #bbb;
   font-weight: normal;
   font-size: 15px;
   line-height: 20px;
   padding-left: 6px;
   padding-bottom: 8px;
+  margin: 10px 0;
+}
+
+row name {
+  display: inline-block;
+  width: 266.8px;
+}
+
+row inputs {
+
 }
 
 ul {
