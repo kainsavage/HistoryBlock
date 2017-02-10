@@ -20,9 +20,9 @@
   <row>
     <name>Matching</name>
     <inputs id="blacklistmatching">
-      <label><input type="radio" name="matching" value="domain"></input> Domain</label>
-      <label><input type="radio" name="matching" value="subdomain"></input> Subdomain</label>
-      <label><input type="radio" name="matching" value="url"></input> Full URL</label>
+      <label title="Match only the domain name; example: https://foo.bar.com/baz -> google.com"><input type="radio" name="matching" value="domain"></input> Domain</label>
+      <label title="Match the domain and subdomain; example: https://foo.bar.com/baz -> foo.bar.com"><input type="radio" name="matching" value="subdomain"></input> Subdomain</label>
+      <label title="Match the entire URL; example: https://foo.bar.com/baz -> foo.bar.com/baz"><input type="radio" name="matching" value="url"></input> Full URL</label>
     </inputs>
   </row>
   <row>
