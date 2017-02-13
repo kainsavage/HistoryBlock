@@ -41,11 +41,16 @@ class HistoryBlock {
       (info, tab) => this.onContextMenuItemClicked(info, tab)
     );
 
-    browser.runtime.onMessage.addListener( (message) => this.onMessage(message) );
+    browser.runtime.onMessage.addListener( 
+      (message) => this.onMessage(message) );
   }
 
   /**
    * Called whenever a message is sent from another extension (or options page).
+   *
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after the given message has been 
+   *         handled.
    */
   async onMessage(message) {
     switch(message.action) {
@@ -68,10 +73,13 @@ class HistoryBlock {
    * Called when one of the context menu items is clicked. Largely this is just
    * a router for the different types of context menu clicks.
    *
-   * @param {object} info
-   *        The data about the context menu click.
-   * @param {object} tab
-   *        The tab in which the context menu click occurred.
+   * @param  {object} info
+   *         The data about the context menu click.
+   * @param  {object} tab
+   *         The tab in which the context menu click occurred.
+   * @return {Promise} promise
+   *         A promise that is fulfilled after the context menu click has been
+   *         handled.
    */
   async onContextMenuItemClicked(info, tab) {
     switch(info.menuItemId) {
@@ -88,11 +96,14 @@ class HistoryBlock {
    * session to forget about that closed tab, thus removing it from the 
    * recently closed tabs list.
    *
-   * @param {integer} tabId
-   *        The identifier of the tab before it was closed. Note: tabs that are
-   *        closed lose their tabId, so this value is useless.
-   * @param {object} removeInfo
-   *        Metadata about the removed tab.
+   * @param  {integer} tabId
+   *         The identifier of the tab before it was closed. Note: tabs that are
+   *         closed lose their tabId, so this value is useless.
+   * @param  {object} removeInfo
+   *         Metadata about the removed tab.
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after a tab has been removed and then
+   *         potentially forgotten.
    */
   async onTabRemoved(tabId, removeInfo) {
     let info = await browser.sessions.getRecentlyClosed();
@@ -103,7 +114,7 @@ class HistoryBlock {
       let blacklist = await this.getBlacklist();
 
       if(blacklist.includes(hash)) {
-        browser.moresessions.forgetClosedTab(info[0].tab.windowId, info[0].tab.sessionId); 
+        await browser.moresessions.forgetClosedTab(info[0].tab.windowId, info[0].tab.sessionId); 
       }
     }
   }
@@ -114,9 +125,12 @@ class HistoryBlock {
    * blacklist, then tell the session to forget about that closed window, thus
    * removing it from the recently closed windows list.
    *
-   * @param {integer} windowId
-   *        The identifier of the window before it was closed. Note: windows 
-   *        that are closed lose their windowId, so this value is useless.
+   * @param  {integer} windowId
+   *         The identifier of the window before it was closed. Note: windows 
+   *         that are closed lose their windowId, so this value is useless.
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after a window has been removed and
+   *         then potentially forgotten.
    */
   async onWindowRemoved(windowId) {
     let info = await browser.sessions.getRecentlyClosed();
@@ -127,7 +141,7 @@ class HistoryBlock {
       let blacklist = await this.getBlacklist();
 
       if(blacklist.includes(hash)) {
-        browser.moresessions.forgetClosedWindow(info[0].window.sessionId);
+        await browser.moresessions.forgetClosedWindow(info[0].window.sessionId);
       }
     }
   }
@@ -137,25 +151,27 @@ class HistoryBlock {
    * the domain name of the url of this visit exists in the HistoryBlock 
    * blacklist, then remove the url from the history.
    *
-   * @param {object} info
-   *        The data about the visit.
+   * @param  {object} info
+   *         The data about the visit.
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after a page has been visited and 
+   *         then potentially removed from the browser history.
    */
   async onPageVisited(info) {
-    return this.removeHistory(info.url);
-  }
+    let domain = this.matcher.match(info[0].window.tabs[0].url);
+    let hash = await this.hash.digest(domain);
+    let blacklist = await this.getBlacklist();
 
-  /**
-   * Attempts to remove the given url from the browser history.
-   *
-   * @param {string} url
-   *        The url to remove from the browser history.
-   */
-  async removeHistory(url) {
-    return browser.history.deleteUrl({'url': url});
+    if(blacklist.includes(hash)) {
+      await browser.history.deleteUrl({'url': info.url});
+    }
   }
 
   /**
    * Empties out the blacklist.
+   *
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after the blacklist has been cleared.
    */
   async clearBlacklist() {
     await browser.storage.sync.remove('blacklist');
@@ -163,11 +179,15 @@ class HistoryBlock {
     // Re-initializes the object.
     await this.getBlacklist();
 
+    // Purposefully do not wait for this Promise to be fulfilled.
     browser.runtime.sendMessage({action: 'blacklistUpdated'});
   }
 
   /**
    * Retrieves the blacklist from browser storage.
+   *
+   * @return {Promise} promise
+   *         A Promise that is fulfilled with the value of the blacklist.
    */
   async getBlacklist() {
     let storage = await browser.storage.sync.get();
@@ -182,30 +202,39 @@ class HistoryBlock {
   }
 
   /**
+   * Attempts to import the list of hashes into the blacklist.
    *
+   * @return {Promise} promise
+   *         A Promise that is fulfilled when the given list of hashes have
+   *         been imported into the blacklist.
    */
   async importBlacklist(list) {
     if(list) {
       let blarr = list.split(',');
       let blacklist = await this.getBlacklist();
 
-      await blarr.forEach( (hash) => {
-        if(!blacklist.includes(hash)) {
+      for(let i = 0; i < blarr.length; i++) {
+        let hash = blarr[i].trim();
+        if(!blacklist.includes(hash) && this.hash.test(hash)) {
           blacklist.push(hash);
         }
-      });
+      }
 
       await browser.storage.sync.set({blacklist:blacklist});
 
-      await browser.runtime.sendMessage({action: 'blacklistUpdated'});
+      // Purposefully do not wait for this Promise to be fulfilled.
+      browser.runtime.sendMessage({action: 'blacklistUpdated'});
     }
   }
 
   /**
    * Attempts to blacklist the domain name of the given url.
    *
-   * @param {string} url
-   *        The url to add to the blacklist.
+   * @param  {string} url
+   *         The url to add to the blacklist.
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after the given URL is potentially
+   *         added to the blacklist.
    */
   async block(url) {
     let domain = this.matcher.match(url);
@@ -219,7 +248,8 @@ class HistoryBlock {
 
         await browser.storage.sync.set({blacklist:blacklist});
 
-        await browser.runtime.sendMessage({action: 'blacklistUpdated'});
+        // Purposefully do not wait for this Promise to be fulfilled.
+        browser.runtime.sendMessage({action: 'blacklistUpdated'});
       }
     }
   }
@@ -227,8 +257,11 @@ class HistoryBlock {
   /**
    * Attempts to unblacklist the domain name of the url of the given tab.
    *
-   * @param {string} url
-   *        The url to remove from the blacklist.
+   * @param  {string} url
+   *         The url to remove from the blacklist.
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after the given URL is potentially
+   *         removed from the blacklist.
    */
   async unblock(url) {
     let domain = this.matcher.match(url);
@@ -242,7 +275,8 @@ class HistoryBlock {
 
         await browser.storage.sync.set({blacklist:blacklist});
 
-        await browser.runtime.sendMessage({action: 'blacklistUpdated'});
+        // Purposefully do not wait for this Promise to be fulfilled.
+        browser.runtime.sendMessage({action: 'blacklistUpdated'});
       }
     }
   }
@@ -250,8 +284,11 @@ class HistoryBlock {
   /**
    * Changes the type of blacklist encryption being used.
    *
-   * @param {string} type
-   *        The type of blacklist encryption to use.
+   * @param  {string} type
+   *         The type of blacklist encryption to use.
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after the blacklist encryption type
+   *         is potentially changed.
    */
   async changeBlacklistType(type) {
     let blacklist = await this.getBlacklist();
@@ -274,14 +311,17 @@ class HistoryBlock {
       })
     }
     
-    return browser.storage.sync.set({type: type});
+    await browser.storage.sync.set({type: type});
   }
 
   /**
    * Changes the blacklist matching being used.
    *
-   * @param {string} matching
-   *        The technique of matching to use.
+   * @param  {string} matching
+   *         The technique of matching to use.
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after the blacklist URL matching
+   *         technique is potentially changed.
    */
   async changeBlacklistMatching(matching) {
     if(!matching) {
@@ -299,7 +339,7 @@ class HistoryBlock {
       this.matcher = new DomainMatcher();
     }
 
-    return browser.storage.sync.set({matching: matching});
+    await browser.storage.sync.set({matching: matching});
   }
 }
 

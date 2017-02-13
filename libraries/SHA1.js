@@ -1,3 +1,5 @@
+const SHA1_REGEXP = /^[0-9A-Fa-f]{40}$/;
+
 /**
  * A lightweight SHA1 library built on top of the browser's crypto object.
  */
@@ -5,6 +7,18 @@ class SHA1 {
 	constructor() {
     // Deliberately empty.
 	}
+
+  /**
+   * Tests the given input string to see if it is a valid SHA1 hash.
+   *
+   * @param  {string} str
+   *         The string to test.
+   * @return {boolean} result
+   *         Whether the given input string is a valid SHA1 hash.
+   */
+  test(str) {
+    return SHA1_REGEXP.test(str);
+  }
 
   /**
    * Digests the given string into the hex-encoded SHA1 hash.
