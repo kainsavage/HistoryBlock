@@ -10,5 +10,32 @@
   },
   "unblock": {
     "message": "Unblock"
+  },
+  "resetBlacklist": {
+    "message": "Are you sure you want to delete the blacklist (this cannot be undone)?"
+  },
+  "addUrl": {
+    "message": "Enter the url or domain name (or comma separated list) to blacklist."
+  },
+  "removeUrl": {
+    "message": "Enter the url or domain name (or comma separated list) to remove from the blacklist."
+  },
+  "changeBlacklistTypeNone": {
+    "message": "Choosing 'none' for encryption type means that anyone who can open this page can see your blacklist in plain text (not recommended). This action will clear your blacklist entirely; are you sure you want your blacklist to be unencrypted?"
+  },
+  "changeBlacklistTypeSHA1": {
+    "message": "This action will encrypt your blacklist entirely; are you sure you want your blacklist to be encrypted using SHA1 (this cannot be undone)?"
+  },
+  "changeMatchingToDomain": {
+    "message": "This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on domains?"
+  },
+  "changeMatchingToSubdomain": {
+    "message": "This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on subdomains?"
+  },
+  "changeMatchingToURL": {
+    "message": "This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on URLs?"
+  },
+  "importBlacklist": {
+    "message": "Enter a comma-separated list of hashes to import."
   }
 }

@@ -1,29 +1,20 @@
-const resetBlacklist = 'Are you sure you want to delete the blacklist (this cannot be undone)?';
-const addUrl = 'Enter the url or domain name to blacklist.';
-const removeUrl = 'Enter the url or domain name to remove from the blacklist.';
-const changeBlacklistTypeNone = 'Choosing "none" for encryption type means that anyone who can open this page can see your blacklist in plain text (not recommended). This action will clear your blacklist entirely; are you sure you want your blacklist to be unencrypted?';
-const changeBlacklistTypeSHA1 = 'This action will clear your blacklist entirely; are you sure you want your blacklist to be encrypted using SHA1?';
-const changeMatchingToDomain = 'This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on domains?';
-const changeMatchingToSubdomain = 'This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on subdomains?';
-const changeMatchingToURL = 'This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on URLs?';
-
 class Options {
   constructor() {
     document.querySelector("#resetBlacklist").addEventListener("click", () => {
-      if(confirm(resetBlacklist)) {
+      if(confirm(browser.i18n.getMessage('resetBlacklist'))) {
         this.resetBlacklist().then(() => this.renderBlacklist());
       }
     });
 
     document.querySelector("#addToBlacklist").addEventListener("click", () => {
-      let url = prompt(addUrl);
+      let url = prompt(browser.i18n.getMessage('addUrl'));
       if(url) {
         this.addToBlacklist(url).then(() => this.renderBlacklist());
       }
     });
 
     document.querySelector("#removeFromBlacklist").addEventListener("click", () => {
-      let url = prompt(removeUrl);
+      let url = prompt(browser.i18n.getMessage('removeUrl'));
       if(url) {
         this.removeFromBlacklist(url).then(() => this.renderBlacklist());
       }
@@ -32,9 +23,11 @@ class Options {
     document.querySelector("#blacklisttype").addEventListener("change", (event) => {
       let blacklistType = event.target.value;
 
-      if(blacklistType === 'none' && confirm(changeBlacklistTypeNone) ||
-         blacklistType === 'sha1' && confirm(changeBlacklistTypeSHA1)) {
-        this.changeBlacklistType(blacklistType); 
+      if(blacklistType === 'none' && 
+          confirm(browser.i18n.getMessage('changeBlacklistTypeNone')) ||
+         blacklistType === 'sha1' && 
+          confirm(browser.i18n.getMessage('changeBlacklistTypeSHA1'))) {
+        this.changeBlacklistType(blacklistType).then(() => this.renderBlacklistType());
       }
       else {
         this.renderBlacklistType();
@@ -44,15 +37,26 @@ class Options {
     document.querySelector("#blacklistmatching").addEventListener("change", (event) => {
       let matching = event.target.value;
 
-      if(matching === 'domain' && confirm(changeMatchingToDomain) ||
-         matching === 'subdomain' && confirm(changeMatchingToSubdomain) ||
-         matching === 'url' && confirm(changeMatchingToURL)) {
+      if(matching === 'domain' && 
+          confirm(browser.i18n.getMessage('changeMatchingToDomain')) ||
+         matching === 'subdomain' && 
+          confirm(browser.i18n.getMessage('changeMatchingToSubdomain')) ||
+         matching === 'url' && 
+          confirm(browser.i18n.getMessage('changeMatchingToURL'))) {
         this.changeBlacklistMatching(matching);
       }
       else {
         this.renderBlacklistMatching();
       }
-    })
+    });
+
+    document.querySelector("#import").addEventListener("click", () => {
+      let blacklist = prompt(browser.i18n.getMessage('importBlacklist'));
+
+      if(blacklist) {
+        this.importBlacklist(blacklist);
+      }
+    });
 
     browser.runtime.onMessage.addListener( (message) => this.onMessage(message) );
 
@@ -84,23 +88,38 @@ class Options {
   }
 
   /**
-   * Sends a message to have HistoryBlock add the given URL to the blacklist.
+   * Sends a message to have HistoryBlock add the given URLs to the blacklist.
    *
-   * @param {string} url
-   *        The URL to add to the blacklist.
+   * @param {string} input
+   *        The list of comma-separated URLs to add to the blacklist.
    */
-  async addToBlacklist(url) {
-    return browser.runtime.sendMessage({action: 'addToBlacklist', url: url});
+  async addToBlacklist(input) {
+    let urls = input.split(',');
+
+    for(let i = 0; i < urls.length; i++) {
+      await browser.runtime.sendMessage({action: 'addToBlacklist', url: urls[i]});
+    }
   }
 
   /**
-   * Sends a message to have HistoryBlock remove the given URL from the blacklist.
+   * Sends a message to have HistoryBlock import the given blacklist.
+   */
+  async importBlacklist(blacklist) {
+    return browser.runtime.sendMessage({action: 'importBlacklist', blacklist: blacklist});
+  }
+
+  /**
+   * Sends a message to have HistoryBlock remove the given URLs from the blacklist.
    *
    * @param {string} url
-   *        The URL to remove from the blacklist.
+   *        The list of comma-separated URLs to remove from the blacklist.
    */
-  async removeFromBlacklist(url) {
-    return browser.runtime.sendMessage({action: 'removeFromBlacklist', url: url});
+  async removeFromBlacklist(input) {
+    let urls = input.split(',');
+
+    for(let i = 0; i < urls.length; i++) {
+      await browser.runtime.sendMessage({action: 'removeFromBlacklist', url: urls[i]});
+    }
   }
 
   /**
@@ -111,8 +130,6 @@ class Options {
    */
   async changeBlacklistType(type) {
     await browser.runtime.sendMessage({action: 'changeBlacklistType', type: type});
-
-    return this.resetBlacklist();
   }
 
   /**
@@ -123,8 +140,6 @@ class Options {
    */
   async changeBlacklistMatching(matching) {
     await browser.runtime.sendMessage({action: 'changeBlacklistMatching', matching: matching});
-
-    return this.resetBlacklist();
   }
 
   /**
@@ -135,6 +150,13 @@ class Options {
 
     if(typeof storage.type !== 'string') {
       storage.type = 'sha1';
+    }
+
+    if(storage.type === 'none') {
+      document.querySelector("#import").style.visibility = 'hidden';
+    }
+    else if(storage.type === 'sha1') {
+      document.querySelector("#import").style.visibility = 'visible';
     }
 
     let ul = document.querySelector('#blacklisttype');

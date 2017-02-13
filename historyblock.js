@@ -50,20 +50,17 @@ class HistoryBlock {
   async onMessage(message) {
     switch(message.action) {
       case 'addToBlacklist':
-        this.block(message.url);
-        break;
+        return this.block(message.url);
+      case 'importBlacklist':
+        return this.importBlacklist(message.blacklist);
       case 'removeFromBlacklist':
-        this.unblock(message.url);
-        break;
+        return this.unblock(message.url);
       case 'clearBlacklist':
-        this.clearBlacklist();
-        break;
+        return this.clearBlacklist();
       case 'changeBlacklistType':
-        this.changeBlacklistType(message.type);
-        break;
+        return this.changeBlacklistType(message.type);
       case 'changeBlacklistMatching':
-        this.changeBlacklistMatching(message.matching);
-        break;
+        return this.changeBlacklistMatching(message.matching);
     }
   }
 
@@ -185,6 +182,26 @@ class HistoryBlock {
   }
 
   /**
+   *
+   */
+  async importBlacklist(list) {
+    if(list) {
+      let blarr = list.split(',');
+      let blacklist = await this.getBlacklist();
+
+      await blarr.forEach( (hash) => {
+        if(!blacklist.includes(hash)) {
+          blacklist.push(hash);
+        }
+      });
+
+      await browser.storage.sync.set({blacklist:blacklist});
+
+      await browser.runtime.sendMessage({action: 'blacklistUpdated'});
+    }
+  }
+
+  /**
    * Attempts to blacklist the domain name of the given url.
    *
    * @param {string} url
@@ -200,9 +217,9 @@ class HistoryBlock {
       if(!blacklist.includes(hash)) {
         blacklist.push(hash);
 
-        browser.storage.sync.set({blacklist:blacklist});
+        await browser.storage.sync.set({blacklist:blacklist});
 
-        browser.runtime.sendMessage({action: 'blacklistUpdated'});
+        await browser.runtime.sendMessage({action: 'blacklistUpdated'});
       }
     }
   }
@@ -223,9 +240,9 @@ class HistoryBlock {
       if(blacklist.includes(hash)) {
         blacklist.splice(blacklist.indexOf(hash), 1);
 
-        browser.storage.sync.set({blacklist:blacklist});
+        await browser.storage.sync.set({blacklist:blacklist});
 
-        browser.runtime.sendMessage({action: 'blacklistUpdated'});
+        await browser.runtime.sendMessage({action: 'blacklistUpdated'});
       }
     }
   }
@@ -237,19 +254,27 @@ class HistoryBlock {
    *        The type of blacklist encryption to use.
    */
   async changeBlacklistType(type) {
+    let blacklist = await this.getBlacklist();
+
     if(!type) {
       type = await browser.storage.sync.get('type');
       type = type.type;
     }
+
+    await this.clearBlacklist();
 
     if(type === 'none') {
       this.hash = new NoHash();
     }
     else {
       this.hash = new SHA1();
+      // Hash the old non-blocked entry.
+      blacklist.forEach(async (domain) => {
+        await this.block(domain);
+      })
     }
     
-    browser.storage.sync.set({type: type});
+    return browser.storage.sync.set({type: type});
   }
 
   /**
@@ -274,7 +299,7 @@ class HistoryBlock {
       this.matcher = new DomainMatcher();
     }
 
-    browser.storage.sync.set({matching: matching});
+    return browser.storage.sync.set({matching: matching});
   }
 }
 
