@@ -1,68 +1,30 @@
 class Options {
   constructor() {
-    document.querySelector("#resetBlacklist").addEventListener("click", () => {
-      if(confirm(browser.i18n.getMessage('resetBlacklist'))) {
-        this.resetBlacklist().then(() => this.renderBlacklist());
-      }
-    });
-
-    document.querySelector("#addToBlacklist").addEventListener("click", () => {
-      let url = prompt(browser.i18n.getMessage('addUrl'));
-      if(url) {
-        this.addToBlacklist(url).then(() => this.renderBlacklist());
-      }
-    });
-
-    document.querySelector("#removeFromBlacklist").addEventListener("click", () => {
-      let url = prompt(browser.i18n.getMessage('removeUrl'));
-      if(url) {
-        this.removeFromBlacklist(url).then(() => this.renderBlacklist());
-      }
-    });
-
-    document.querySelector("#blacklisttype").addEventListener("change", (event) => {
-      let blacklistType = event.target.value;
-
-      if(blacklistType === 'none' && 
-          confirm(browser.i18n.getMessage('changeBlacklistTypeNone')) ||
-         blacklistType === 'sha1' && 
-          confirm(browser.i18n.getMessage('changeBlacklistTypeSHA1'))) {
-        this.changeBlacklistType(blacklistType).then(() => this.renderBlacklistType());
-      }
-      else {
-        this.renderBlacklistType();
-      }
-    });
-
-    document.querySelector("#blacklistmatching").addEventListener("change", (event) => {
-      let matching = event.target.value;
-
-      if(matching === 'domain' && 
-          confirm(browser.i18n.getMessage('changeMatchingToDomain')) ||
-         matching === 'subdomain' && 
-          confirm(browser.i18n.getMessage('changeMatchingToSubdomain')) ||
-         matching === 'url' && 
-          confirm(browser.i18n.getMessage('changeMatchingToURL'))) {
-        this.changeBlacklistMatching(matching);
-      }
-      else {
-        this.renderBlacklistMatching();
-      }
-    });
-
-    document.querySelector("#import").addEventListener("click", () => {
-      let blacklist = prompt(browser.i18n.getMessage('importBlacklist'));
-
-      if(blacklist) {
-        this.importBlacklist(blacklist);
-      }
-    });
-
-    browser.runtime.onMessage.addListener( (message) => this.onMessage(message) );
+    this.attachListeners();
 
     this.renderBlacklistType();
     this.renderBlacklistMatching();
     this.renderBlacklist();
+  }
+
+  /**
+   * Attaches the event listeners to the DOM.
+   */
+  attachListeners() {
+    document.querySelector("#resetBlacklist").addEventListener("click", 
+      () => this.resetBlacklist());
+    document.querySelector("#addToBlacklist").addEventListener("click", 
+      () => this.addToBlacklist());
+    document.querySelector("#removeFromBlacklist").addEventListener("click", 
+      () => this.removeFromBlacklist());
+    document.querySelector("#blacklisttype").addEventListener("change", 
+      event => this.changeBlacklistType(event.target.value));
+    document.querySelector("#blacklistmatching").addEventListener("change", 
+      event => this.changeBlacklistMatching(event.target.value));
+    document.querySelector("#import").addEventListener("click", 
+      () => this.importBlacklist() );
+    browser.runtime.onMessage.addListener(
+      (message) => this.onMessage(message) );
   }
 
   /**
@@ -71,65 +33,104 @@ class Options {
    *
    * @param {string} message
    *        The message.
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled when the message has been 
+   *         handled.
    */
   async onMessage(message) {
     switch(message.action) {
       case "blacklistUpdated":
-        this.renderBlacklist();
-        break;
+        return this.renderBlacklist();
     }
   }
 
   /**
    * Sends a message to have HistoryBlock clear the blacklist.
+   * 
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the blacklist has been 
+   *         cleared.
    */
   async resetBlacklist() {
-    return browser.runtime.sendMessage({action: 'clearBlacklist'});
+    if(confirm(browser.i18n.getMessage('resetBlacklist'))) {
+      await browser.runtime.sendMessage({action: 'clearBlacklist'});
+      await this.renderBlacklist();
+    }
   }
 
   /**
    * Sends a message to have HistoryBlock add the given URLs to the blacklist.
    *
-   * @param {string} input
-   *        The list of comma-separated URLs to add to the blacklist.
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the input has been added to
+   *         the blacklist.
    */
-  async addToBlacklist(input) {
-    let urls = input.split(',');
+  async addToBlacklist() {
+    let input = prompt(browser.i18n.getMessage('addUrl'));
+    if(input) {
+      let urls = input.split(',');
 
-    for(let i = 0; i < urls.length; i++) {
-      await browser.runtime.sendMessage({action: 'addToBlacklist', url: urls[i]});
+      for(let i = 0; i < urls.length; i++) {
+        await browser.runtime.sendMessage({action: 'addToBlacklist', url: urls[i]});
+      }
+
+      await this.renderBlacklist();
     }
   }
 
   /**
    * Sends a message to have HistoryBlock import the given blacklist.
+   * 
+   * @return {Promise} blacklist
+   *         A Promise that will be fulfilled after the input has been added to
+   *         the blacklist.
    */
-  async importBlacklist(blacklist) {
-    return browser.runtime.sendMessage({action: 'importBlacklist', blacklist: blacklist});
+  async importBlacklist() {
+    let blacklist = prompt(browser.i18n.getMessage('importBlacklist'));
+
+    if(blacklist) {
+      await browser.runtime.sendMessage({action: 'importBlacklist', blacklist: blacklist});
+    }
   }
 
   /**
    * Sends a message to have HistoryBlock remove the given URLs from the blacklist.
    *
-   * @param {string} url
-   *        The list of comma-separated URLs to remove from the blacklist.
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the input has been removed
+   *         from the blacklist.
    */
-  async removeFromBlacklist(input) {
-    let urls = input.split(',');
+  async removeFromBlacklist() {
+    let input = prompt(browser.i18n.getMessage('removeUrl'));
+    if(input) {
+      let urls = input.split(',');
 
-    for(let i = 0; i < urls.length; i++) {
-      await browser.runtime.sendMessage({action: 'removeFromBlacklist', url: urls[i]});
+      for(let i = 0; i < urls.length; i++) {
+        await browser.runtime.sendMessage({action: 'removeFromBlacklist', url: urls[i]});
+      }
+
+      await this.renderBlacklist();
     }
   }
 
   /**
    * Sends a message to have HistoryBlock change the blacklist encryption type.
    *
-   * @param {string} type
+   * @param {string} blacklistType
    *        The type of encryption to use on blacklist entries.
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the blacklist encryption 
+   *         type has been changed.
    */
-  async changeBlacklistType(type) {
-    await browser.runtime.sendMessage({action: 'changeBlacklistType', type: type});
+  async changeBlacklistType(blacklistType) {
+    if(blacklistType === 'none' && 
+        confirm(browser.i18n.getMessage('changeBlacklistTypeNone')) ||
+       blacklistType === 'sha1' && 
+        confirm(browser.i18n.getMessage('changeBlacklistTypeSHA1'))) {
+      await browser.runtime.sendMessage({action: 'changeBlacklistType', type: blacklistType});
+    }
+    
+    await this.renderBlacklistType();
   }
 
   /**
@@ -137,13 +138,29 @@ class Options {
    *
    * @param {string} matching
    *        The technique of matching to use on URLs.
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the blacklist URL matching
+   *         technique has been changed.
    */
   async changeBlacklistMatching(matching) {
-    await browser.runtime.sendMessage({action: 'changeBlacklistMatching', matching: matching});
+    if(matching === 'domain' && 
+        confirm(browser.i18n.getMessage('changeMatchingToDomain')) ||
+       matching === 'subdomain' && 
+        confirm(browser.i18n.getMessage('changeMatchingToSubdomain')) ||
+       matching === 'url' && 
+        confirm(browser.i18n.getMessage('changeMatchingToURL'))) {
+      await browser.runtime.sendMessage({action: 'changeBlacklistMatching', matching: matching});
+    }
+      
+    await this.renderBlacklistMatching();
   }
 
   /**
    * Renders the blacklist encryption type controls.
+   *
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the blacklist encryption
+   *         type elements have been rendered.
    */
   async renderBlacklistType() {
     let storage = await browser.storage.sync.get();
@@ -171,6 +188,10 @@ class Options {
 
   /**
    * Renders the blacklist matching technique controls.
+   *
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the blacklist URL matching
+   *         technique elements have been rendered.
    */
   async renderBlacklistMatching() {
     let storage = await browser.storage.sync.get();
@@ -191,6 +212,10 @@ class Options {
 
   /**
    * Renders the blacklist.
+   *
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the blacklist has been 
+   *         rendered.
    */
   async renderBlacklist() {
     let storage = await browser.storage.sync.get();
