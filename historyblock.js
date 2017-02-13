@@ -158,7 +158,7 @@ class HistoryBlock {
    *         then potentially removed from the browser history.
    */
   async onPageVisited(info) {
-    let domain = this.matcher.match(info[0].window.tabs[0].url);
+    let domain = this.matcher.match(info.url);
     let hash = await this.hash.digest(domain);
     let blacklist = await this.getBlacklist();
 
