@@ -1,6 +1,9 @@
 class Options {
   constructor() {
-    this.attachListeners();
+    this.attachDOMListeners();
+    
+    browser.runtime.onMessage.addListener(
+      message => this.onMessage(message) );
 
     this.renderBlacklistType();
     this.renderBlacklistMatching();
@@ -10,21 +13,19 @@ class Options {
   /**
    * Attaches the event listeners to the DOM.
    */
-  attachListeners() {
-    document.querySelector("#resetBlacklist").addEventListener("click", 
-      () => this.resetBlacklist());
-    document.querySelector("#addToBlacklist").addEventListener("click", 
-      () => this.addToBlacklist());
-    document.querySelector("#removeFromBlacklist").addEventListener("click", 
-      () => this.removeFromBlacklist());
-    document.querySelector("#blacklisttype").addEventListener("change", 
-      event => this.changeBlacklistType(event.target.value));
-    document.querySelector("#blacklistmatching").addEventListener("change", 
-      event => this.changeBlacklistMatching(event.target.value));
-    document.querySelector("#import").addEventListener("click", 
-      () => this.importBlacklist() );
-    browser.runtime.onMessage.addListener(
-      (message) => this.onMessage(message) );
+  attachDOMListeners() {
+    document.querySelector("#resetBlacklist").addEventListener(
+      "click", () => this.resetBlacklist());
+    document.querySelector("#addToBlacklist").addEventListener(
+      "click", () => this.addToBlacklist());
+    document.querySelector("#removeFromBlacklist").addEventListener(
+      "click", () => this.removeFromBlacklist());
+    document.querySelector("#blacklisttype").addEventListener(
+      "change", event => this.changeBlacklistType(event.target.value));
+    document.querySelector("#blacklistmatching").addEventListener(
+      "change", event => this.changeBlacklistMatching(event.target.value));
+    document.querySelector("#import").addEventListener(
+      "click", () => this.importBlacklist() );
   }
 
   /**

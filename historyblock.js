@@ -12,19 +12,14 @@ class HistoryBlock {
   constructor() {
     this.changeBlacklistType();
     this.changeBlacklistMatching();
+    this.createContextMenuItems();
+    this.attachEventListeners();
+  }
 
-    browser.tabs.onRemoved.addListener( 
-      (tabId, removeInfo) => this.onTabRemoved(tabId, removeInfo)
-    );
-
-    browser.windows.onRemoved.addListener(
-      windowId => this.onWindowRemoved(windowId)
-    );
-
-    browser.history.onVisited.addListener(
-      info => this.onPageVisited(info)
-    );
-
+  /**
+   * Creates the HistoryBlock context menu items.
+   */
+  createContextMenuItems() {
     chrome.contextMenus.create({
       id: "blockthis",
       title: browser.i18n.getMessage('block'),
@@ -36,13 +31,26 @@ class HistoryBlock {
       title: browser.i18n.getMessage('unblock'),
       contexts: ["all"]
     });
+  }
 
+  /**
+   * Attaches the various HistoryBlock event listeners.
+   */
+  attachEventListeners() {
+    browser.tabs.onRemoved.addListener( 
+      (tabId, removeInfo) => this.onTabRemoved(tabId, removeInfo)
+    );
+    browser.windows.onRemoved.addListener(
+      windowId => this.onWindowRemoved(windowId)
+    );
+    browser.history.onVisited.addListener(
+      info => this.onPageVisited(info)
+    );
     chrome.contextMenus.onClicked.addListener(
       (info, tab) => this.onContextMenuItemClicked(info, tab)
     );
-
     browser.runtime.onMessage.addListener( 
-      (message) => this.onMessage(message) );
+      message => this.onMessage(message) );
   }
 
   /**
