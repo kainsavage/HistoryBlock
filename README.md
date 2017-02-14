@@ -10,17 +10,17 @@ HistoryBlock is a browser extension for maintaining a blacklist of hashed undesi
 
 ##### SHA1 (default)
 
-With SHA1 blacklist encryption, every entry added to the blacklist is first matched (see [Address Matching](#Addresss_Matching)) and then digested using SHA1 encryption to create a [hash value](https://en.wikipedia.org/wiki/Hash_function) which is then stored with HistoryBlock.
+With SHA1 blacklist encryption, every entry added to the blacklist is first matched (see [Address Matching](#address-matching)) and then digested using SHA1 encryption to create a [hash value](https://en.wikipedia.org/wiki/Hash_function) which is then stored with HistoryBlock.
 
 The same process occurs on every page visit and tab/window close to check the address against the blacklist. In this way, the blacklist remains encrypted so that no one could see, in plain text, what sites are included in the blacklist.
 
 ##### None
 
-With no encryption, every entry added to the blacklist is first matched (see [Address Matching](#Address_Matching)) and the stored with HistoryBlock.
+With no encryption, every entry added to the blacklist is first matched (see [Address Matching](#address-matching)) and the stored with HistoryBlock.
 
 When a page is visited or a tab/window closed, the address is checked against the blacklist.
 
-Storing blacklist entries in plain text is **not** recommended as they will be visible on the [addons page](about:addons).
+Storing blacklist entries in plain text is **not** recommended as they will be visible on the addons page (about:addons).
 
 #### Address Matching
 
@@ -56,13 +56,13 @@ The blacklist as it exists given the current HistoryBlock settings.
 
 ##### Import
 
-The Import button is only available if [Blacklist Encryption](#Blacklist_Encryption) is set to `SHA1`. This control is a legacy support for migrating a HistoryBlock v1.x blacklist to a v2.x blacklist.
+The Import button is only available if [Blacklist Encryption](#blacklist-encryption) is set to `SHA1`. This control is a legacy support for migrating a HistoryBlock v1.x blacklist to a v2.x blacklist.
 
 Prompts the user to enter a comma-separated list of hash values to add to the current blacklist.
 
 ###### Migrating Legacy Blacklist
 
-Visit [about:config] and search for `extensions.historyblock.stringpref`. Double-click the row to open the value editor, and copy the entire value (it will be a comma-separated list of hash values) suitable for entering at the [Import] control.
+Visit [about:config] and search for `extensions.historyblock.stringpref`. Double-click the row to open the value editor, and copy the entire value (it will be a comma-separated list of hash values) suitable for entering at the [#import] control.
 
 ##### Add Domain
 
@@ -84,8 +84,8 @@ Both Block and Unblock are available on every page in the context menu so as not
 
 #### Block
 
-Blocks the current tab's address using the current settings for [Address Matching](#Address_Matching) and [Blacklist Encryption](#Blacklist_Encryption).
+Blocks the current tab's address using the current settings for [Address Matching](#address-matching) and [Blacklist Encryption](#blacklist-encryption).
 
 #### Unblock
 
-Blocks the current tab's address using the current settings for [Address Matching](#Address_Matching) and [Blacklist Encryption](#Blacklist_Encryption).
+Blocks the current tab's address using the current settings for [Address Matching](#address-matching) and [Blacklist Encryption](#blacklist-encryption).
