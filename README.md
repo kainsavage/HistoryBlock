@@ -60,7 +60,7 @@ Prompts the user to enter a comma-separated list of hash values to add to the cu
 
 ##### Migrating Legacy Blacklist
 
-Visit `about:config` and search for `extensions.historyblock.stringpref`. Double-click the row to open the value editor, and copy the entire value (it will be a comma-separated list of hash values) suitable for entering at the (import)[#import] control.
+Visit `about:config` and search for `extensions.historyblock.stringpref`. Double-click the row to open the value editor, and copy the entire value (it will be a comma-separated list of hash values) suitable for entering at the import control.
 
 #### Add Domain
 
