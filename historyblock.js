@@ -63,9 +63,11 @@ class HistoryBlock {
       case 'clearBlacklist':
         return this.clearBlacklist();
       case 'changeBlacklistType':
-        return this.changeBlacklistType(message.type);
+        await this.changeBlacklistType(message.type)
+        return this.clearBlacklist();
       case 'changeBlacklistMatching':
-        return this.changeBlacklistMatching(message.matching);
+        await this.changeBlacklistMatching(message.matching);
+        return this.clearBlacklist();
     }
   }
 
@@ -106,7 +108,7 @@ class HistoryBlock {
    *         potentially forgotten.
    */
   async onTabRemoved(tabId, removeInfo) {
-    let info = await browser.sessions.getRecentlyClosed();
+    let info = await browser.sessions.getRecentlyClosed({maxResults: 1});
 
     if(info[0].tab) {
       let domain = this.matcher.match(info[0].tab.url);
@@ -133,7 +135,7 @@ class HistoryBlock {
    *         then potentially forgotten.
    */
   async onWindowRemoved(windowId) {
-    let info = await browser.sessions.getRecentlyClosed();
+    let info = await browser.sessions.getRecentlyClosed({maxResults: 1});
 
     if(info[0].window) {
       let domain = this.matcher.match(info[0].window.tabs[0].url);
@@ -297,8 +299,6 @@ class HistoryBlock {
       type = await browser.storage.sync.get('type');
       type = type.type;
     }
-
-    await this.clearBlacklist();
 
     if(type === 'none') {
       this.hash = new NoHash();
