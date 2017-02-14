@@ -18,7 +18,7 @@ With no encryption, every entry added to the blacklist is first matched (see [Ad
 
 When a page is visited or a tab/window closed, the address is checked against the blacklist.
 
-Storing blacklist entries in plain text is **not** recommended as they will be visible on the addons page (about:addons).
+Storing blacklist entries in plain text is **not** recommended as they will be visible on the addons page (`about:addons`).
 
 ### Address Matching
 
@@ -60,7 +60,7 @@ Prompts the user to enter a comma-separated list of hash values to add to the cu
 
 ##### Migrating Legacy Blacklist
 
-Visit [about:config] and search for `extensions.historyblock.stringpref`. Double-click the row to open the value editor, and copy the entire value (it will be a comma-separated list of hash values) suitable for entering at the [#import] control.
+Visit `about:config` and search for `extensions.historyblock.stringpref`. Double-click the row to open the value editor, and copy the entire value (it will be a comma-separated list of hash values) suitable for entering at the (import)[#import] control.
 
 #### Add Domain
 
