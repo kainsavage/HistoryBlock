@@ -119,12 +119,13 @@ class HistoryBlock {
     let info = await browser.sessions.getRecentlyClosed({maxResults: 1});
 
     if(info[0].tab) {
-      let domain = this.matcher.match(info[0].tab.url);
+      let tab = info[0].tab;
+      let domain = this.matcher.match(tab.url);
       let hash = await this.hash.digest(domain);
       let blacklist = await this.getBlacklist();
 
       if(blacklist.includes(hash)) {
-        await browser.moresessions.forgetClosedTab(info[0].tab.windowId, info[0].tab.sessionId); 
+        await browser.moresessions.forgetClosedTab(tab.windowId, tab.sessionId);
       }
     }
   }
@@ -146,7 +147,9 @@ class HistoryBlock {
     let info = await browser.sessions.getRecentlyClosed({maxResults: 1});
 
     if(info[0].window) {
-      let domain = this.matcher.match(info[0].window.tabs[0].url);
+      // If there is a window, there is a tab.
+      let tab = info[0].window.tabs[0];
+      let domain = this.matcher.match(tab.url);
       let hash = await this.hash.digest(domain);
       let blacklist = await this.getBlacklist();
 
