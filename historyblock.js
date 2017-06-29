@@ -125,7 +125,7 @@ class HistoryBlock {
       let blacklist = await this.getBlacklist();
 
       if(blacklist.includes(hash)) {
-        await browser.moresessions.forgetClosedTab(tab.windowId, tab.sessionId);
+        await browser.sessions.forgetClosedTab(tab.windowId, tab.sessionId);
       }
     }
   }
@@ -154,7 +154,7 @@ class HistoryBlock {
       let blacklist = await this.getBlacklist();
 
       if(blacklist.includes(hash)) {
-        await browser.moresessions.forgetClosedWindow(info[0].window.sessionId);
+        await browser.sessions.forgetClosedWindow(info[0].window.sessionId);
       }
     }
   }

@@ -22,7 +22,6 @@
 
   "permissions": [
     "sessions",
-    "experiments.moresessions",
     "tabs",
     "history",
     "storage",

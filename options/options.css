@@ -10,11 +10,17 @@ body, button {
   color: #333;
 }
 
+#buttoncontainer {
+  display:flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding-bottom: 4px;
+}
+
 button {
-  padding: 4px 20px;
+  padding: 0px 20px;
   background-color: #fbfbfb;
   border: 1px solid #bbb;
-  float: right;
   margin: 0 4px;
 }
 
@@ -27,7 +33,6 @@ row {
   border-bottom: 1px solid #bbb;
   font-weight: normal;
   font-size: 15px;
-  line-height: 20px;
   padding-left: 6px;
   padding-bottom: 8px;
   margin: 10px 0;
@@ -40,10 +45,6 @@ row.nounderline {
 row name {
   display: inline-block;
   width: 266.8px;
-}
-
-row inputs {
-
 }
 
 ul {

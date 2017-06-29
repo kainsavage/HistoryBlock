@@ -177,10 +177,10 @@ class Options {
       document.querySelector("#import").style.visibility = 'visible';
     }
 
-    let ul = document.querySelector('#blacklisttype');
+    let radios = document.querySelectorAll('#blacklisttype input');
 
-    for(let i=0; i<ul.childElementCount; i++) {
-      let radio = ul.children[i].children[0];
+    for(let i=0; i<radios.length; i++) {
+      let radio = radios[i];
       if(radio.value === storage.type) {
         radio.checked = true;
       }
@@ -201,10 +201,10 @@ class Options {
       storage.matching = 'domain';
     }
 
-    let ul = document.querySelector('#blacklistmatching');
+    let radios = document.querySelectorAll('#blacklistmatching input');
 
-    for(let i=0; i<ul.childElementCount; i++) {
-      let radio = ul.children[i].children[0];
+    for(let i=0; i<radios.length; i++) {
+      let radio = radios[i];
       if(radio.value === storage.matching) {
         radio.checked = true;
       }

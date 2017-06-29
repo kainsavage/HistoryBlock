@@ -13,16 +13,21 @@
   <row>
     <name>Encryption</name>
     <inputs id="blacklisttype">
-      <label><input type="radio" name="type" value="sha1"></input> SHA1</label>
-      <label><input type="radio" name="type" value="none"></input> None</label>
+      <input type="radio" name="type" id="sha1" value="sha1" />
+      <label for="sha1">SHA1</label>
+      <input type="radio" name="type" id="non" value="none" />
+      <label for="non">None</label>
     </inputs>
   </row>
   <row>
     <name>Matching</name>
     <inputs id="blacklistmatching">
-      <label title="Match only the domain name; example: https://foo.bar.com/baz -> google.com"><input type="radio" name="matching" value="domain"></input> Domain</label>
-      <label title="Match the domain and subdomain; example: https://foo.bar.com/baz -> foo.bar.com"><input type="radio" name="matching" value="subdomain"></input> Subdomain</label>
-      <label title="Match the entire URL; example: https://foo.bar.com/baz -> foo.bar.com/baz"><input type="radio" name="matching" value="url"></input> Full URL</label>
+      <input type="radio" name="matching" value="domain" id="domain"></input>
+      <label title="Match only the domain name; example: https://foo.bar.com/baz -> google.com" for="domain">Domain</label>
+      <input type="radio" name="matching" value="subdomain" id="subdomain"></input>
+      <label title="Match the domain and subdomain; example: https://foo.bar.com/baz -> foo.bar.com" for="subdomain">Subdomain</label>
+      <input type="radio" name="matching" value="url" id="url"></input>
+      <label title="Match the entire URL; example: https://foo.bar.com/baz -> foo.bar.com/baz" for="url">Full URL</label>
     </inputs>
   </row>
   <row class="nounderline">
@@ -31,12 +36,12 @@
   <div id="blacklistcontainer">
     <ul id="blacklist"></ul>
   </div>
-  <button id="resetBlacklist">Clear Blacklist</button>
-  <button id="removeFromBlacklist">Remove Domain</button>
-  <button id="addToBlacklist">Add Domain</button>
-  <button id="import">Import</button>
-
-  <h3>
+  <div id="buttoncontainer">
+    <button id="resetBlacklist">Clear Blacklist</button>
+    <button id="removeFromBlacklist">Remove Domain</button>
+    <button id="addToBlacklist">Add Domain</button>
+    <button id="import">Import</button>
+  </div>
 </body>
 
 </html>
