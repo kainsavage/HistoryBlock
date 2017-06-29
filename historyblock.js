@@ -20,13 +20,13 @@ class HistoryBlock {
    * Creates the HistoryBlock context menu items.
    */
   createContextMenuItems() {
-    chrome.contextMenus.create({
+    browser.contextMenus.create({
       id: "blockthis",
       title: browser.i18n.getMessage('block'),
       contexts: ["all"]
     });
 
-    chrome.contextMenus.create({
+    browser.contextMenus.create({
       id: "unblockthis",
       title: browser.i18n.getMessage('unblock'),
       contexts: ["all"]
@@ -46,7 +46,7 @@ class HistoryBlock {
     browser.history.onVisited.addListener(
       info => this.onPageVisited(info)
     );
-    chrome.contextMenus.onClicked.addListener(
+    browser.contextMenus.onClicked.addListener(
       (info, tab) => this.onContextMenuItemClicked(info, tab)
     );
     browser.runtime.onMessage.addListener( 
@@ -263,6 +263,8 @@ class HistoryBlock {
 
         // Purposefully do not wait for this Promise to be fulfilled.
         browser.runtime.sendMessage({action: 'blacklistUpdated'});
+
+        await browser.history.deleteUrl({'url': url});
       }
     }
   }

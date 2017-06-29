@@ -16,7 +16,8 @@
 
   "applications": {
     "gecko": {
-      "id": "historyblock@kain"
+      "id": "historyblock@kain",
+      "strict_min_version": "55.0"
     }
   },
 
