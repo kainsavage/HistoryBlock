@@ -1,0 +1,56 @@
+{
+  "manifest_version": 2,
+  "name": "__MSG_extensionName__",
+  "version": "2.0",
+
+  "description": "__MSG_extensionDescription__",
+
+  "author": "kain",
+  "developer": {
+    "name": "kain"
+  },
+
+  "default_locale": "en",
+
+  "homepage_url": "https://github.com/kainsavage/HistoryBlock",
+
+  "applications": {
+    "gecko": {
+      "id": "historyblock@kain",
+      "strict_min_version": "55.0"
+    }
+  },
+
+  "permissions": [
+    "sessions",
+    "tabs",
+    "history",
+    "storage",
+    "contextMenus"
+  ],
+
+  "background": {
+    "scripts": [
+      "libraries/psl.js",
+      "libraries/NoHash.js",
+      "libraries/SHA1.js",
+      "libraries/Matcher.js",
+      "libraries/DomainMatcher.js",
+      "libraries/SubdomainMatcher.js",
+      "libraries/URLMatcher.js",
+      "historyblock.js"
+    ]
+  },
+
+  "icons": {
+    "16": "icons/HistoryBlock16x16.png",
+    "32": "icons/HistoryBlock32x32.png",
+    "64": "icons/HistoryBlock64x64.png",
+    "128": "icons/HistoryBlock128x128.png",
+    "512": "icons/HistoryBlock512x512.png"
+  },
+
+  "options_ui": {
+    "page": "options/index.html"
+  }
+}

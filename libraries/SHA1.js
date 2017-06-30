@@ -1,26 +1,36 @@
-/**
- * The SHA1 library.
- */
+const SHA1_REGEXP = /^[0-9A-Fa-f]{40}$/;
 
+/**
+ * A lightweight SHA1 library built on top of the browser's crypto object.
+ */
 class SHA1 {
 	constructor() {
+    // Deliberately empty.
 	}
 
   /**
-   * Digests the given string into the hex-encoded SHA1 hash.
+   * Tests the given input string to see if it is a valid SHA1 hash.
+   *
+   * @param  {string} str
+   *         The string to test.
+   * @return {boolean} result
+   *         Whether the given input string is a valid SHA1 hash.
    */
-  digest(str) {
-    let buffer = new TextEncoder("utf-8").encode(str);
-
-    return crypto.subtle.digest("SHA-1", buffer).then( (hash) => {
-      return this.hex(hash);
-    });
+  test(str) {
+    return SHA1_REGEXP.test(str);
   }
 
   /**
-   * Only to be used internally.
+   * Digests the given string into the hex-encoded SHA1 hash.
+   *
+   * @param {string} str
+   *        The string to be digested.
    */
-  hex(buffer) {
+  async digest(str) {
+    let encoded = new TextEncoder("utf-8").encode(str);
+
+    let buffer = await crypto.subtle.digest("SHA-1", encoded);
+
     let hexCodes = [];
     let view = new DataView(buffer);
     for (let i = 0; i < view.byteLength; i += 4) {
