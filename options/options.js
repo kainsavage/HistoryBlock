@@ -7,6 +7,7 @@ class Options {
 
     this.renderBlacklistType();
     this.renderBlacklistMatching();
+    this.renderBlacklistCookies();
     this.renderBlacklist();
   }
 
@@ -15,17 +16,26 @@ class Options {
    */
   attachDOMListeners() {
     document.querySelector("#resetBlacklist").addEventListener(
-      "click", () => this.resetBlacklist());
+      "click", () => this.resetBlacklist()
+    );
     document.querySelector("#addToBlacklist").addEventListener(
-      "click", () => this.addToBlacklist());
+      "click", () => this.addToBlacklist()
+    );
     document.querySelector("#removeFromBlacklist").addEventListener(
-      "click", () => this.removeFromBlacklist());
+      "click", () => this.removeFromBlacklist()
+    );
     document.querySelector("#blacklisttype").addEventListener(
-      "change", event => this.changeBlacklistType(event.target.value));
+      "change", event => this.changeBlacklistType(event.target.value)
+    );
     document.querySelector("#blacklistmatching").addEventListener(
-      "change", event => this.changeBlacklistMatching(event.target.value));
+      "change", event => this.changeBlacklistMatching(event.target.value)
+    );
+    document.querySelector("#cookies").addEventListener(
+      "change", event => this.changeCookies(event.target.checked)
+    );
     document.querySelector("#import").addEventListener(
-      "click", () => this.importBlacklist() );
+      "click", () => this.importBlacklist()
+    );
   }
 
   /**
@@ -34,7 +44,7 @@ class Options {
    *
    * @param {string} message
    *        The message.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled when the message has been 
    *         handled.
    */
@@ -48,7 +58,7 @@ class Options {
   /**
    * Sends a message to have HistoryBlock clear the blacklist.
    * 
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled after the blacklist has been 
    *         cleared.
    */
@@ -62,7 +72,7 @@ class Options {
   /**
    * Sends a message to have HistoryBlock add the given URLs to the blacklist.
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled after the input has been added to
    *         the blacklist.
    */
@@ -82,7 +92,7 @@ class Options {
   /**
    * Sends a message to have HistoryBlock import the given blacklist.
    * 
-   * @return {Promise} blacklist
+   * @return {Promise}
    *         A Promise that will be fulfilled after the input has been added to
    *         the blacklist.
    */
@@ -97,7 +107,7 @@ class Options {
   /**
    * Sends a message to have HistoryBlock remove the given URLs from the blacklist.
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled after the input has been removed
    *         from the blacklist.
    */
@@ -119,7 +129,7 @@ class Options {
    *
    * @param {string} blacklistType
    *        The type of encryption to use on blacklist entries.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled after the blacklist encryption 
    *         type has been changed.
    */
@@ -139,7 +149,7 @@ class Options {
    *
    * @param {string} matching
    *        The technique of matching to use on URLs.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled after the blacklist URL matching
    *         technique has been changed.
    */
@@ -157,9 +167,24 @@ class Options {
   }
 
   /**
+   * Sends a message to have HistoryBlock change whether cookies are blacklisted.
+   * 
+   * @param {string} blacklistCookies 
+   *        Whether or not cookies should be blacklisted
+   */
+  async changeCookies(blacklistCookies) {
+    if((blacklistCookies && confirm(browser.i18n.getMessage('enableBlacklistCookies'))) ||
+       !blacklistCookies) {
+      await browser.runtime.sendMessage({action: 'changeBlacklistCookies', blacklistCookies:blacklistCookies});
+    }
+
+    await this.renderBlacklistCookies();
+  }
+
+  /**
    * Renders the blacklist encryption type controls.
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled after the blacklist encryption
    *         type elements have been rendered.
    */
@@ -190,7 +215,7 @@ class Options {
   /**
    * Renders the blacklist matching technique controls.
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled after the blacklist URL matching
    *         technique elements have been rendered.
    */
@@ -212,9 +237,26 @@ class Options {
   }
 
   /**
+   * Renders the blacklist cookies option controls.
+   * 
+   * @return {Promise}
+   *         A Promise that will be fulfilled after the blacklist cookies
+   *         control elements have been rendered.
+   */
+  async renderBlacklistCookies() {
+    let storage = await browser.storage.sync.get();
+
+    if(typeof storage.blacklistCookies !== 'boolean') {
+      storage.blacklistCookies = false;
+    }
+
+    document.querySelector("#cookies").checked = storage.blacklistCookies;
+  }
+
+  /**
    * Renders the blacklist.
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that will be fulfilled after the blacklist has been 
    *         rendered.
    */

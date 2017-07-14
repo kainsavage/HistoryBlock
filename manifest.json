@@ -26,7 +26,9 @@
     "tabs",
     "history",
     "storage",
-    "contextMenus"
+    "contextMenus",
+    "cookies",
+    "<all_urls>"
   ],
 
   "background": {
