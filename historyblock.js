@@ -56,7 +56,7 @@ class HistoryBlock {
   /**
    * Called whenever a message is sent from another extension (or options page).
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after the given message has been 
    *         handled.
    */
@@ -76,6 +76,8 @@ class HistoryBlock {
       case 'changeBlacklistMatching':
         await this.changeBlacklistMatching(message.matching);
         return this.clearBlacklist();
+      case 'changeBlacklistCookies':
+        return await this.changeBlacklistCookies(message.blacklistCookies);
     }
   }
 
@@ -87,7 +89,7 @@ class HistoryBlock {
    *         The data about the context menu click.
    * @param  {object} tab
    *         The tab in which the context menu click occurred.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A promise that is fulfilled after the context menu click has been
    *         handled.
    */
@@ -111,7 +113,7 @@ class HistoryBlock {
    *         closed lose their tabId, so this value is useless.
    * @param  {object} removeInfo
    *         Metadata about the removed tab.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after a tab has been removed and then
    *         potentially forgotten.
    */
@@ -126,6 +128,8 @@ class HistoryBlock {
 
       if(blacklist.includes(hash)) {
         await browser.sessions.forgetClosedTab(tab.windowId, tab.sessionId);
+
+        await this.removeCookies(tab.url);
       }
     }
   }
@@ -139,7 +143,7 @@ class HistoryBlock {
    * @param  {integer} windowId
    *         The identifier of the window before it was closed. Note: windows 
    *         that are closed lose their windowId, so this value is useless.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after a window has been removed and
    *         then potentially forgotten.
    */
@@ -155,6 +159,8 @@ class HistoryBlock {
 
       if(blacklist.includes(hash)) {
         await browser.sessions.forgetClosedWindow(info[0].window.sessionId);
+
+        await this.removeCookies(tab.url);
       }
     }
   }
@@ -166,7 +172,7 @@ class HistoryBlock {
    *
    * @param  {object} info
    *         The data about the visit.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after a page has been visited and 
    *         then potentially removed from the browser history.
    */
@@ -183,7 +189,7 @@ class HistoryBlock {
   /**
    * Empties out the blacklist.
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after the blacklist has been cleared.
    */
   async clearBlacklist() {
@@ -199,7 +205,7 @@ class HistoryBlock {
   /**
    * Retrieves the blacklist from browser storage.
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled with the value of the blacklist.
    */
   async getBlacklist() {
@@ -217,7 +223,7 @@ class HistoryBlock {
   /**
    * Attempts to import the list of hashes into the blacklist.
    *
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled when the given list of hashes have
    *         been imported into the blacklist.
    */
@@ -245,7 +251,7 @@ class HistoryBlock {
    *
    * @param  {string} url
    *         The url to add to the blacklist.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after the given URL is potentially
    *         added to the blacklist.
    */
@@ -264,6 +270,8 @@ class HistoryBlock {
         // Purposefully do not wait for this Promise to be fulfilled.
         browser.runtime.sendMessage({action: 'blacklistUpdated'});
 
+        await this.removeCookies(url);
+
         await browser.history.deleteUrl({'url': url});
       }
     }
@@ -274,7 +282,7 @@ class HistoryBlock {
    *
    * @param  {string} url
    *         The url to remove from the blacklist.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after the given URL is potentially
    *         removed from the blacklist.
    */
@@ -297,11 +305,40 @@ class HistoryBlock {
   }
 
   /**
+   * Deletes all cookies directly related to the given URL.
+   * 
+   * Note: only deletes cookies if user has set preference to do so.
+   * 
+   * @param  {string} url
+   *         The full URL that will determine the cookies to delete.
+   * @return {Promise}
+   *         A Promise that is fulfilled after the cookies associated
+   *         to url are deleted.
+   */
+  async removeCookies(url) {
+    let blacklistCookies = await browser.storage.sync.get('blacklistCookies');
+    blacklistCookies = blacklistCookies.blacklistCookies;
+
+    if(blacklistCookies) {
+      let cookies = await browser.cookies.getAll({
+        url: url
+      });
+
+      cookies.forEach( async cookie => {
+        await browser.cookies.remove({
+          url: url,
+          name: cookie.name
+        });
+      });
+    }
+  }
+
+  /**
    * Changes the type of blacklist encryption being used.
    *
    * @param  {string} type
    *         The type of blacklist encryption to use.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after the blacklist encryption type
    *         is potentially changed.
    */
@@ -332,7 +369,7 @@ class HistoryBlock {
    *
    * @param  {string} matching
    *         The technique of matching to use.
-   * @return {Promise} promise
+   * @return {Promise}
    *         A Promise that is fulfilled after the blacklist URL matching
    *         technique is potentially changed.
    */
@@ -353,6 +390,16 @@ class HistoryBlock {
     }
 
     await browser.storage.sync.set({matching: matching});
+  }
+
+  /**
+   * Changes whether cookies should be blacklisted.
+   * 
+   * @param {boolean} blacklistCookies 
+   *        Whether cookies should be blacklisted.
+   */
+  async changeBlacklistCookies(blacklistCookies) {
+    await browser.storage.sync.set({blacklistCookies: blacklistCookies});
   }
 }
 

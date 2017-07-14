@@ -35,6 +35,9 @@
   "changeMatchingToURL": {
     "message": "This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on URLs?"
   },
+  "enableBlacklistCookies": {
+    "message": "This action will enable the removal of cookies belonging to blacklist entries upon session end (read: tab closed, window closed, and 'Block' actions). Many sites rely on cookies for detecting whether users are logged in, among many other features."
+  },
   "importBlacklist": {
     "message": "Enter a comma-separated list of hashes to import."
   }
