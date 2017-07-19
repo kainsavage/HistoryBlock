@@ -31,7 +31,7 @@
 
   "background": {
     "scripts": [
-      "libraries/psl.js",
+      "libraries/psl.min.js",
       "libraries/NoHash.js",
       "libraries/SHA1.js",
       "libraries/Matcher.js",
