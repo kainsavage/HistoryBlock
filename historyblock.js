@@ -13,6 +13,7 @@ class HistoryBlock {
     this.changeBlacklistType();
     this.changeBlacklistMatching();
     this.createContextMenuItems();
+    this.attachContextMenuControls();
     this.createFunctionBindings();
     this.attachEventListeners();
   }
@@ -21,17 +22,36 @@ class HistoryBlock {
    * Creates the HistoryBlock context menu items.
    */
   createContextMenuItems() {
-    browser.contextMenus.create({
+    this.blockContextMenuItem = {
       id: "blockthis",
       title: browser.i18n.getMessage('block'),
       contexts: ["all"]
-    });
-
-    browser.contextMenus.create({
+    };
+    this.unblockContextMenuItem = {
       id: "unblockthis",
       title: browser.i18n.getMessage('unblock'),
       contexts: ["all"]
-    });
+    };
+  }
+
+  /**
+   * Attaches the context menu controls if enabled in the HistoryBlock options.
+   */
+  async attachContextMenuControls() {
+    let storage = await browser.storage.sync.get();
+
+    if(storage.enableContextMenu === undefined) {
+      storage.enableContextMenu = true;
+      await browser.storage.sync.set({enableContextMenu: storage.enableContextMenu});
+    }
+
+    if(storage.enableContextMenu) {
+      browser.contextMenus.create(this.blockContextMenuItem);
+      browser.contextMenus.create(this.unblockContextMenuItem);
+    }
+    else {
+      browser.contextMenus.removeAll();
+    }
   }
 
   /**
@@ -82,6 +102,8 @@ class HistoryBlock {
         return this.clearBlacklist();
       case 'changeBlacklistCookies':
         return await this.changeBlacklistCookies(message.blacklistCookies);
+      case 'changeContextMenuControls':
+        return await this.changeContextMenuControls(message.enabled);
     }
   }
 
@@ -405,11 +427,29 @@ class HistoryBlock {
   /**
    * Changes whether cookies should be blacklisted.
    * 
-   * @param {boolean} blacklistCookies 
-   *        Whether cookies should be blacklisted.
+   * @param  {boolean} blacklistCookies 
+   *         Whether cookies should be blacklisted.
+   * @return {Promise}
+   *         A Promise that is fulfilled after the blacklistCookies option is
+   *         set.
    */
   async changeBlacklistCookies(blacklistCookies) {
     await browser.storage.sync.set({blacklistCookies: blacklistCookies});
+  }
+
+  /**
+   * Changes whether the context menu controls are enabled.
+   * 
+   * @param  {boolean} enabled
+   *         Whether the context menu controls should be enabled.
+   * @return {Promise}
+   *         A Promise that is fulfilled after the context menu controls option
+   *         of enabled is set.
+   */
+  async changeContextMenuControls(enabled) {
+    await browser.storage.sync.set({enableContextMenu: enabled});
+
+    await this.attachContextMenuControls();
   }
 }
 

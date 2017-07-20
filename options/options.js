@@ -1,41 +1,58 @@
 class Options {
   constructor() {
+    this.createFunctionBindings();
     this.attachDOMListeners();
-    
-    browser.runtime.onMessage.addListener(
-      message => this.onMessage(message) );
-
-    this.renderBlacklistType();
-    this.renderBlacklistMatching();
-    this.renderBlacklistCookies();
+    this.attachWebExtensionListeners();
+    this.renderBlacklistTypeControls();
+    this.renderBlacklistMatchingControls();
+    this.renderBlacklistCookieControls();
+    this.renderContextMenuControls();
     this.renderBlacklist();
+  }
+
+  /**
+   * Creates boundFunctions out of all the event listener functions
+   * so that the `this` variable always refers to the Options object.
+   */
+  createFunctionBindings() {
+    this.onMessage = this.onMessage.bind(this);
+    this.resetBlacklist = this.resetBlacklist.bind(this);
+    this.addToBlacklist = this.addToBlacklist.bind(this);
+    this.removeFromBlacklist = this.removeFromBlacklist.bind(this);
+    this.changeBlacklistType = this.changeBlacklistType.bind(this);
+    this.changeBlacklistMatching = this.changeBlacklistMatching.bind(this);
+    this.changeCookies = this.changeCookies.bind(this);
+    this.importBlacklist = this.importBlacklist.bind(this);
+    this.changeContextMenu = this.changeContextMenu.bind(this);
+  }
+
+  /**
+   * Attaches the event listeners to the WebExtension components.
+   */
+  attachWebExtensionListeners() {
+    browser.runtime.onMessage.addListener(this.onMessage);
   }
 
   /**
    * Attaches the event listeners to the DOM.
    */
   attachDOMListeners() {
-    document.querySelector("#resetBlacklist").addEventListener(
-      "click", () => this.resetBlacklist()
-    );
-    document.querySelector("#addToBlacklist").addEventListener(
-      "click", () => this.addToBlacklist()
-    );
-    document.querySelector("#removeFromBlacklist").addEventListener(
-      "click", () => this.removeFromBlacklist()
-    );
-    document.querySelector("#blacklisttype").addEventListener(
-      "change", event => this.changeBlacklistType(event.target.value)
-    );
-    document.querySelector("#blacklistmatching").addEventListener(
-      "change", event => this.changeBlacklistMatching(event.target.value)
-    );
-    document.querySelector("#cookies").addEventListener(
-      "change", event => this.changeCookies(event.target.checked)
-    );
-    document.querySelector("#import").addEventListener(
-      "click", () => this.importBlacklist()
-    );
+    document.querySelector("#resetBlacklist")
+      .addEventListener("click", this.resetBlacklist);
+    document.querySelector("#addToBlacklist")
+      .addEventListener("click", this.addToBlacklist);
+    document.querySelector("#removeFromBlacklist")
+      .addEventListener("click", this.removeFromBlacklist);
+    document.querySelector("#blacklisttype")
+      .addEventListener("change", this.changeBlacklistType);
+    document.querySelector("#blacklistmatching")
+      .addEventListener("change", this.changeBlacklistMatching);
+    document.querySelector("#cookies")
+      .addEventListener("change", this.changeCookies);
+    document.querySelector("#contextmenu")
+      .addEventListener("change", this.changeContextMenu)
+    document.querySelector("#import")
+      .addEventListener("click", this.importBlacklist);
   }
 
   /**
@@ -127,13 +144,14 @@ class Options {
   /**
    * Sends a message to have HistoryBlock change the blacklist encryption type.
    *
-   * @param {string} blacklistType
-   *        The type of encryption to use on blacklist entries.
+   * @param {object} event
+   *        The event fired.
    * @return {Promise}
    *         A Promise that will be fulfilled after the blacklist encryption 
    *         type has been changed.
    */
-  async changeBlacklistType(blacklistType) {
+  async changeBlacklistType(event) {
+    let blacklistType = event.target.value;
     if(blacklistType === 'none' && 
         confirm(browser.i18n.getMessage('changeBlacklistTypeNone')) ||
        blacklistType === 'sha1' && 
@@ -141,19 +159,20 @@ class Options {
       await browser.runtime.sendMessage({action: 'changeBlacklistType', type: blacklistType});
     }
     
-    await this.renderBlacklistType();
+    await this.renderBlacklistTypeControls();
   }
 
   /**
    * Sends a message to have HistoryBlock change the matching technique.
    *
-   * @param {string} matching
-   *        The technique of matching to use on URLs.
+   * @param {object} event
+   *        The event that was fired.
    * @return {Promise}
    *         A Promise that will be fulfilled after the blacklist URL matching
    *         technique has been changed.
    */
-  async changeBlacklistMatching(matching) {
+  async changeBlacklistMatching(event) {
+    let matching = event.target.value;
     if(matching === 'domain' && 
         confirm(browser.i18n.getMessage('changeMatchingToDomain')) ||
        matching === 'subdomain' && 
@@ -163,22 +182,43 @@ class Options {
       await browser.runtime.sendMessage({action: 'changeBlacklistMatching', matching: matching});
     }
       
-    await this.renderBlacklistMatching();
+    await this.renderBlacklistMatchingControls();
   }
 
   /**
-   * Sends a message to have HistoryBlock change whether cookies are blacklisted.
+   * Sends a message to have HistoryBlock change whether cookies are 
+   * blacklisted.
    * 
-   * @param {string} blacklistCookies 
-   *        Whether or not cookies should be blacklisted
+   * @param {object} event 
+   *        The event that was fired.
    */
-  async changeCookies(blacklistCookies) {
-    if((blacklistCookies && confirm(browser.i18n.getMessage('enableBlacklistCookies'))) ||
+  async changeCookies(event) {
+    let blacklistCookies = event.target.checked;
+    if((blacklistCookies && 
+          confirm(browser.i18n.getMessage('enableBlacklistCookies'))) ||
        !blacklistCookies) {
-      await browser.runtime.sendMessage({action: 'changeBlacklistCookies', blacklistCookies:blacklistCookies});
+      await browser.runtime.sendMessage({
+        action: 'changeBlacklistCookies', 
+        blacklistCookies:blacklistCookies
+      });
     }
 
-    await this.renderBlacklistCookies();
+    await this.renderBlacklistCookieControls();
+  }
+
+  /**
+   * Sends a message to have HistoryBlock change whether the context menu 
+   * controls are enabled.
+   * 
+   * @param {object} event
+   *        The event that was fired.
+   */
+  async changeContextMenu(event) {
+    let enabled = event.target.checked;
+    await browser.runtime.sendMessage({
+      action: 'changeContextMenuControls',
+      enabled: enabled
+    });
   }
 
   /**
@@ -188,7 +228,7 @@ class Options {
    *         A Promise that will be fulfilled after the blacklist encryption
    *         type elements have been rendered.
    */
-  async renderBlacklistType() {
+  async renderBlacklistTypeControls() {
     let storage = await browser.storage.sync.get();
 
     if(typeof storage.type !== 'string') {
@@ -219,7 +259,7 @@ class Options {
    *         A Promise that will be fulfilled after the blacklist URL matching
    *         technique elements have been rendered.
    */
-  async renderBlacklistMatching() {
+  async renderBlacklistMatchingControls() {
     let storage = await browser.storage.sync.get();
 
     if(typeof storage.matching !== 'string') {
@@ -243,7 +283,7 @@ class Options {
    *         A Promise that will be fulfilled after the blacklist cookies
    *         control elements have been rendered.
    */
-  async renderBlacklistCookies() {
+  async renderBlacklistCookieControls() {
     let storage = await browser.storage.sync.get();
 
     if(typeof storage.blacklistCookies !== 'boolean') {
@@ -251,6 +291,23 @@ class Options {
     }
 
     document.querySelector("#cookies").checked = storage.blacklistCookies;
+  }
+
+  /**
+   * Renders the blacklist context menu controls.
+   * 
+   * @return {Promise}
+   *         A Promise that will be fulfilled after the blacklist context menu
+   *         control elements have been rendered.
+   */
+  async renderContextMenuControls() {
+    let storage = await browser.storage.sync.get();
+
+    if(typeof storage.enableContextMenu !== 'boolean') {
+      storage.enableContextMenu = true;
+    }
+
+    document.querySelector("#contextmenu").checked = storage.enableContextMenu;
   }
 
   /**
