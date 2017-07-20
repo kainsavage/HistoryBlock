@@ -13,6 +13,7 @@ class HistoryBlock {
     this.changeBlacklistType();
     this.changeBlacklistMatching();
     this.createContextMenuItems();
+    this.createFunctionBindings();
     this.attachEventListeners();
   }
 
@@ -34,23 +35,26 @@ class HistoryBlock {
   }
 
   /**
+   * Creates boundFunctions out of all the event listener functions
+   * so that the `this` variable always refers to the HistoryBlock object.
+   */
+  createFunctionBindings() {
+    this.onTabRemoved = this.onTabRemoved.bind(this);
+    this.onWindowRemoved = this.onWindowRemoved.bind(this);
+    this.onPageVisited = this.onPageVisited.bind(this);
+    this.onContextMenuItemClicked = this.onContextMenuItemClicked.bind(this);
+    this.onMessage = this.onMessage.bind(this);
+  }
+
+  /**
    * Attaches the various HistoryBlock event listeners.
    */
   attachEventListeners() {
-    browser.tabs.onRemoved.addListener( 
-      (tabId, removeInfo) => this.onTabRemoved(tabId, removeInfo)
-    );
-    browser.windows.onRemoved.addListener(
-      windowId => this.onWindowRemoved(windowId)
-    );
-    browser.history.onVisited.addListener(
-      info => this.onPageVisited(info)
-    );
-    browser.contextMenus.onClicked.addListener(
-      (info, tab) => this.onContextMenuItemClicked(info, tab)
-    );
-    browser.runtime.onMessage.addListener( 
-      message => this.onMessage(message) );
+    browser.tabs.onRemoved.addListener(this.onTabRemoved);
+    browser.windows.onRemoved.addListener(this.onWindowRemoved);
+    browser.history.onVisited.addListener(this.onPageVisited);
+    browser.contextMenus.onClicked.addListener(this.onContextMenuItemClicked);
+    browser.runtime.onMessage.addListener(this.onMessage);
   }
 
   /**
