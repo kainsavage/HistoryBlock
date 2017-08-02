@@ -321,7 +321,7 @@ class Options {
     if (storage.blacklist) {
       let el = document.querySelector("#blacklist");
       el.innerHTML = null;
-      storage.blacklist.forEach((hash) => {
+      storage.blacklist.forEach( hash => {
         let li = document.createElement('li');
         li.innerHTML = hash;
         el.appendChild(li);
