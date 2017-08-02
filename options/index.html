@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 
 <html>
-  <head>
-    <meta charset="utf-8">
 
-    <link rel="stylesheet" type="text/css" href="./options.css" />
+<head>
+  <meta charset="utf-8">
 
-    <script src="../libraries/RuntimeAction.js" defer></script>
-    <script src="../libraries/i18n.js" defer></script>
-    <script src="./options.js" defer></script>
-  </head>
+  <link rel="stylesheet" type="text/css" href="./options.css" />
+
+  <script src="../libraries/RuntimeAction.js" defer></script>
+  <script src="../libraries/i18n.js" defer></script>
+  <script src="./options.js" defer></script>
+</head>
 
 <body>
   <row>
     <name>Encryption</name>
-    <inputs id="blacklisttype">
+    <inputs id="blacklisttype" class="browser-style">
       <input type="radio" name="type" id="sha1" value="sha1" />
       <label for="sha1">SHA1</label>
       <input type="radio" name="type" id="non" value="none" />
@@ -23,7 +24,7 @@
   </row>
   <row>
     <name>Matching</name>
-    <inputs id="blacklistmatching">
+    <inputs id="blacklistmatching" class="browser-style">
       <input type="radio" name="matching" value="domain" id="domain"></input>
       <label title="Match only the domain name; example: https://foo.bar.com/baz -> google.com" for="domain">Domain</label>
       <input type="radio" name="matching" value="subdomain" id="subdomain"></input>
@@ -32,12 +33,12 @@
       <label title="Match the entire URL; example: https://foo.bar.com/baz -> foo.bar.com/baz" for="url">Full URL</label>
     </inputs>
   </row>
-  <row>
+  <row class="browser-style">
     <name>User Data</name>
     <input type="checkbox" name="cookies" id="cookies"></input>
     <label title="Delete cookies which are blacklisted" for="cookies">Cookies</label>
   </row>
-  <row>
+  <row class="browser-style">
     <name>Controls</name>
     <input type="checkbox" name="contextmenu" id="contextmenu"></input>
     <label title="Enable context menu (right-click) controls" for="contextmenu">Context Menu</label>
@@ -49,10 +50,10 @@
     <ul id="blacklist"></ul>
   </div>
   <div id="buttoncontainer">
-    <button id="resetBlacklist">Clear Blacklist</button>
-    <button id="removeFromBlacklist">Remove Domain</button>
-    <button id="addToBlacklist">Add Domain</button>
-    <button id="import">Import</button>
+    <button id="resetBlacklist" class="browser-style">Clear Blacklist</button>
+    <button id="removeFromBlacklist" class="browser-style">Remove Domain</button>
+    <button id="addToBlacklist" class="browser-style">Add Domain</button>
+    <button id="import" class="browser-style">Import</button>
   </div>
 </body>
 
