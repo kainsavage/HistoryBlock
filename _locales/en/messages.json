@@ -1,44 +1,44 @@
 {
-  "extensionName": {
+  "EXTENSION_NAME": {
     "message": "HistoryBlock"
   },
-  "extensionDescription": {
+  "EXTENSION_DESCRIPTION": {
     "message": "Cover your tracks!"
   },
-  "block": {
+  "BLOCK": {
     "message": "Block"
   },
-  "unblock": {
+  "UNBLOCK": {
     "message": "Unblock"
   },
-  "resetBlacklist": {
+  "RESET_BLACKLIST_CONFIRM_TEXT": {
     "message": "Are you sure you want to delete the blacklist (this cannot be undone)?"
   },
-  "addUrl": {
+  "ADD_URL_PROMPT_TEXT": {
     "message": "Enter the url or domain name (or comma separated list) to blacklist."
   },
-  "removeUrl": {
+  "REMOVE_URL_PROMPT_TEXT": {
     "message": "Enter the url or domain name (or comma separated list) to remove from the blacklist."
   },
-  "changeBlacklistTypeNone": {
+  "CHANGE_BLACKLIST_TYPE_NONE_CONFIRM_TEXT": {
     "message": "Choosing 'none' for encryption type means that anyone who can open this page can see your blacklist in plain text (not recommended). This action will clear your blacklist entirely; are you sure you want your blacklist to be unencrypted?"
   },
-  "changeBlacklistTypeSHA1": {
+  "CHANGE_BLACKLIST_TYPE_SHA1_CONFIRM_TEXT": {
     "message": "This action will encrypt your blacklist entirely; are you sure you want your blacklist to be encrypted using SHA1 (this cannot be undone)?"
   },
-  "changeMatchingToDomain": {
+  "CHANGE_BLACKLIST_MATCHING_DOMAIN_CONFIRM_TEXT": {
     "message": "This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on domains?"
   },
-  "changeMatchingToSubdomain": {
+  "CHANGE_BLACKLIST_MATCHING_SUBDOMAIN_CONFIRM_TEXT": {
     "message": "This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on subdomains?"
   },
-  "changeMatchingToURL": {
+  "CHANGE_BLACKLIST_MATCHING_URL_CONFIRM_TEXT": {
     "message": "This action will clear your blacklist entirely; are you sure you want your blacklist to be matched on URLs?"
   },
-  "enableBlacklistCookies": {
+  "ENABLE_BLACKLIST_COOKIES_CONFIRM_TEXT": {
     "message": "This action will enable the removal of cookies belonging to blacklist entries upon session end (read: tab closed, window closed, and 'Block' actions). Many sites rely on cookies for detecting whether users are logged in, among many other features."
   },
-  "importBlacklist": {
+  "IMPORT_BLACKLIST_PROMPT_TEXT": {
     "message": "Enter a comma-separated list of hashes to import."
   }
 }

@@ -48,7 +48,7 @@ class Options {
     document.querySelector("#blacklistmatching")
       .addEventListener("change", this.changeBlacklistMatching);
     document.querySelector("#cookies")
-      .addEventListener("change", this.changeCookies);
+      .addEventListener("click", this.changeCookies);
     document.querySelector("#contextmenu")
       .addEventListener("change", this.changeContextMenu)
     document.querySelector("#import")
@@ -66,8 +66,8 @@ class Options {
    *         handled.
    */
   async onMessage(message) {
-    switch(message.action) {
-      case "blacklistUpdated":
+    switch (message.action) {
+      case ACTION.BLACKLIST_UPDATED:
         return this.renderBlacklist();
     }
   }
@@ -80,8 +80,8 @@ class Options {
    *         cleared.
    */
   async resetBlacklist() {
-    if(confirm(browser.i18n.getMessage('resetBlacklist'))) {
-      await browser.runtime.sendMessage({action: 'clearBlacklist'});
+    if (confirm(browser.i18n.getMessage(i18n.RESET_BLACKLIST_CONFIRM_TEXT))) {
+      await browser.runtime.sendMessage({ action: ACTION.CLEAR_BLACKLIST });
       await this.renderBlacklist();
     }
   }
@@ -94,12 +94,12 @@ class Options {
    *         the blacklist.
    */
   async addToBlacklist() {
-    let input = prompt(browser.i18n.getMessage('addUrl'));
-    if(input) {
+    let input = prompt(browser.i18n.getMessage(i18n.ADD_URL_PROMPT_TEXT));
+    if (input) {
       let urls = input.split(',');
 
-      for(let i = 0; i < urls.length; i++) {
-        await browser.runtime.sendMessage({action: 'addToBlacklist', url: urls[i]});
+      for (let i = 0; i < urls.length; i++) {
+        await browser.runtime.sendMessage({ action: ACTION.ADD_TO_BLACKLIST, url: urls[i] });
       }
 
       await this.renderBlacklist();
@@ -114,10 +114,10 @@ class Options {
    *         the blacklist.
    */
   async importBlacklist() {
-    let blacklist = prompt(browser.i18n.getMessage('importBlacklist'));
+    let blacklist = prompt(browser.i18n.getMessage(i18n.IMPORT_BLACKLIST_PROMPT_TEXT));
 
-    if(blacklist) {
-      await browser.runtime.sendMessage({action: 'importBlacklist', blacklist: blacklist});
+    if (blacklist) {
+      await browser.runtime.sendMessage({ action: ACTION.IMPORT_BLACKLIST, blacklist: blacklist });
     }
   }
 
@@ -129,12 +129,12 @@ class Options {
    *         from the blacklist.
    */
   async removeFromBlacklist() {
-    let input = prompt(browser.i18n.getMessage('removeUrl'));
-    if(input) {
+    let input = prompt(browser.i18n.getMessage(i18n.REMOVE_URL_PROMPT_TEXT));
+    if (input) {
       let urls = input.split(',');
 
-      for(let i = 0; i < urls.length; i++) {
-        await browser.runtime.sendMessage({action: 'removeFromBlacklist', url: urls[i]});
+      for (let i = 0; i < urls.length; i++) {
+        await browser.runtime.sendMessage({ action: ACTION.REMOVE_FROM_BLACKLIST, url: urls[i] });
       }
 
       await this.renderBlacklist();
@@ -152,13 +152,13 @@ class Options {
    */
   async changeBlacklistType(event) {
     let blacklistType = event.target.value;
-    if(blacklistType === 'none' && 
-        confirm(browser.i18n.getMessage('changeBlacklistTypeNone')) ||
-       blacklistType === 'sha1' && 
-        confirm(browser.i18n.getMessage('changeBlacklistTypeSHA1'))) {
-      await browser.runtime.sendMessage({action: 'changeBlacklistType', type: blacklistType});
+    if (blacklistType === 'none' &&
+      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_TYPE_NONE_CONFIRM_TEXT)) ||
+      blacklistType === 'sha1' &&
+      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_TYPE_SHA1_CONFIRM_TEXT))) {
+      await browser.runtime.sendMessage({ action: ACTION.CHANGE_BLACKLIST_ENCRYPTION_TYPE, type: blacklistType });
     }
-    
+
     await this.renderBlacklistTypeControls();
   }
 
@@ -173,15 +173,15 @@ class Options {
    */
   async changeBlacklistMatching(event) {
     let matching = event.target.value;
-    if(matching === 'domain' && 
-        confirm(browser.i18n.getMessage('changeMatchingToDomain')) ||
-       matching === 'subdomain' && 
-        confirm(browser.i18n.getMessage('changeMatchingToSubdomain')) ||
-       matching === 'url' && 
-        confirm(browser.i18n.getMessage('changeMatchingToURL'))) {
-      await browser.runtime.sendMessage({action: 'changeBlacklistMatching', matching: matching});
+    if (matching === 'domain' &&
+      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_DOMAIN_CONFIRM_TEXT)) ||
+      matching === 'subdomain' &&
+      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_SUBDOMAIN_CONFIRM_TEXT)) ||
+      matching === 'url' &&
+      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_URL_CONFIRM_TEXT))) {
+      await browser.runtime.sendMessage({ action: ACTION.CHANGE_BLACKLIST_MATCHING, matching: matching });
     }
-      
+
     await this.renderBlacklistMatchingControls();
   }
 
@@ -194,13 +194,11 @@ class Options {
    */
   async changeCookies(event) {
     let blacklistCookies = event.target.checked;
-    if((blacklistCookies && 
-          confirm(browser.i18n.getMessage('enableBlacklistCookies'))) ||
-       !blacklistCookies) {
-      await browser.runtime.sendMessage({
-        action: 'changeBlacklistCookies', 
-        blacklistCookies:blacklistCookies
-      });
+    if (blacklistCookies && confirm(browser.i18n.getMessage(i18n.ENABLE_BLACKLIST_COOKIES_CONFIRM_TEXT))) {
+      await browser.runtime.sendMessage({ action: ACTION.ENABLE_BLACKLIST_COOKIES });
+    }
+    else {
+      await browser.runtime.sendMessage({ action: ACTION.DISABLE_BLACKLIST_COOKIES });
     }
 
     await this.renderBlacklistCookieControls();
@@ -216,7 +214,7 @@ class Options {
   async changeContextMenu(event) {
     let enabled = event.target.checked;
     await browser.runtime.sendMessage({
-      action: 'changeContextMenuControls',
+      action: ACTION.CHANGE_CONTEXT_MENU_CONTROLS,
       enabled: enabled
     });
   }
@@ -231,22 +229,22 @@ class Options {
   async renderBlacklistTypeControls() {
     let storage = await browser.storage.sync.get();
 
-    if(typeof storage.type !== 'string') {
+    if (typeof storage.type !== 'string') {
       storage.type = 'sha1';
     }
 
-    if(storage.type === 'none') {
+    if (storage.type === 'none') {
       document.querySelector("#import").style.visibility = 'hidden';
     }
-    else if(storage.type === 'sha1') {
+    else if (storage.type === 'sha1') {
       document.querySelector("#import").style.visibility = 'visible';
     }
 
     let radios = document.querySelectorAll('#blacklisttype input');
 
-    for(let i=0; i<radios.length; i++) {
+    for (let i = 0; i < radios.length; i++) {
       let radio = radios[i];
-      if(radio.value === storage.type) {
+      if (radio.value === storage.type) {
         radio.checked = true;
       }
     }
@@ -262,15 +260,15 @@ class Options {
   async renderBlacklistMatchingControls() {
     let storage = await browser.storage.sync.get();
 
-    if(typeof storage.matching !== 'string') {
+    if (typeof storage.matching !== 'string') {
       storage.matching = 'domain';
     }
 
     let radios = document.querySelectorAll('#blacklistmatching input');
 
-    for(let i=0; i<radios.length; i++) {
+    for (let i = 0; i < radios.length; i++) {
       let radio = radios[i];
-      if(radio.value === storage.matching) {
+      if (radio.value === storage.matching) {
         radio.checked = true;
       }
     }
@@ -286,7 +284,7 @@ class Options {
   async renderBlacklistCookieControls() {
     let storage = await browser.storage.sync.get();
 
-    if(typeof storage.blacklistCookies !== 'boolean') {
+    if (typeof storage.blacklistCookies !== 'boolean') {
       storage.blacklistCookies = false;
     }
 
@@ -303,7 +301,7 @@ class Options {
   async renderContextMenuControls() {
     let storage = await browser.storage.sync.get();
 
-    if(typeof storage.enableContextMenu !== 'boolean') {
+    if (typeof storage.enableContextMenu !== 'boolean') {
       storage.enableContextMenu = true;
     }
 
@@ -320,10 +318,10 @@ class Options {
   async renderBlacklist() {
     let storage = await browser.storage.sync.get();
 
-    if(storage.blacklist) {
+    if (storage.blacklist) {
       let el = document.querySelector("#blacklist");
       el.innerHTML = null;
-      storage.blacklist.forEach( (hash) => {
+      storage.blacklist.forEach(hash => {
         let li = document.createElement('li');
         li.innerHTML = hash;
         el.appendChild(li);

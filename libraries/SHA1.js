@@ -4,9 +4,9 @@ const SHA1_REGEXP = /^[0-9A-Fa-f]{40}$/;
  * A lightweight SHA1 library built on top of the browser's crypto object.
  */
 class SHA1 {
-	constructor() {
+  constructor() {
     // Deliberately empty.
-	}
+  }
 
   /**
    * Tests the given input string to see if it is a valid SHA1 hash.
