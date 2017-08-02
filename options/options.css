@@ -1,13 +1,6 @@
 body {
   margin: 0;
   padding: 0;
-  text-shadow: 0 1px 1px #fefffe;
-}
-
-body, button {
-  font-family: Segoe UI, sans-serif;
-  font-size: 15px;
-  color: #333;
 }
 
 #buttoncontainer {
@@ -18,14 +11,7 @@ body, button {
 }
 
 button {
-  padding: 0px 20px;
-  background-color: #fbfbfb;
-  border: 1px solid #bbb;
   margin: 0 4px;
-}
-
-button:hover {
-  background-color: #ebebeb;
 }
 
 row {
@@ -44,7 +30,7 @@ row.nounderline {
 
 row name {
   display: inline-block;
-  width: 266.8px;
+  width: 300px;
 }
 
 ul {
@@ -56,4 +42,8 @@ ul {
   height: 150px;
   overflow: scroll;
   margin: 0 0 10px 0;
+}
+
+inputs > label {
+  padding-right: 12px;
 }
