@@ -11,7 +11,7 @@ class SubdomainMatcher extends Matcher {
    */
   match(url) {
     let domain = url.match(hostRegexp);
-    domain = domain[0].replace(domain[1],"");
+    domain = domain[0].replace(domain[1], "");
 
     return domain;
   }
