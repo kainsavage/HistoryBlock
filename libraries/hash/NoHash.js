@@ -2,9 +2,6 @@
  * A pass-through hasher.
  */
 class NoHash {
-  constructor() {
-    // Deliberately empty.
-  }
 
   /**
    * Returns true - all strings satisfy NoHash's test.

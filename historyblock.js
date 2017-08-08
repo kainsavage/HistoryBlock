@@ -155,7 +155,7 @@ class HistoryBlock {
     let blacklist = await this.getBlacklist();
 
     if (blacklist.includes(hash)) {
-      await browser.history.deleteUrl({ 'url': info.url });
+      await browser.history.deleteUrl({ url: info.url });
     }
   }
 
@@ -245,7 +245,7 @@ class HistoryBlock {
 
         await this.removeCookies(url);
 
-        await browser.history.deleteUrl({ 'url': url });
+        await browser.history.deleteUrl({ url: url });
       }
     }
   }

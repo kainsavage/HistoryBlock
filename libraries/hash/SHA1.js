@@ -1,11 +1,16 @@
-const SHA1_REGEXP = /^[0-9A-Fa-f]{40}$/;
-
 /**
  * A lightweight SHA1 library built on top of the browser's crypto object.
  */
 class SHA1 {
+
+  /**
+   * Simple constructor
+   */
   constructor() {
-    // Deliberately empty.
+    this.regexp = /^[0-9A-Fa-f]{40}$/;
+    this.encoding = 'utf-8';
+    this.cipher = 'SHA-1';
+    this.padding = '00000000';
   }
 
   /**
@@ -17,7 +22,7 @@ class SHA1 {
    *         Whether the given input string is a valid SHA1 hash.
    */
   test(str) {
-    return SHA1_REGEXP.test(str);
+    return this.regexp.test(str);
   }
 
   /**
@@ -27,24 +32,23 @@ class SHA1 {
    *        The string to be digested.
    */
   async digest(str) {
-    let encoded = new TextEncoder("utf-8").encode(str);
+    let encoded = new TextEncoder(this.encoding).encode(str);
 
-    let buffer = await crypto.subtle.digest("SHA-1", encoded);
+    let buffer = await crypto.subtle.digest(this.cipher, encoded);
 
     let hexCodes = [];
     let view = new DataView(buffer);
     for (let i = 0; i < view.byteLength; i += 4) {
       // Using getUint32 reduces the number of iterations needed (we process 4 bytes each time)
-      let value = view.getUint32(i)
+      let value = view.getUint32(i);
       // toString(16) will give the hex representation of the number without padding
       let stringValue = value.toString(16)
       // We use concatenation and slice for padding
-      let padding = '00000000'
-      let paddedValue = (padding + stringValue).slice(-padding.length)
+      let paddedValue = (this.padding + stringValue).slice(-this.padding.length);
       hexCodes.push(paddedValue);
     }
 
     // Join all the hex strings into one
-    return hexCodes.join("");
+    return hexCodes.join('');
   }
 }

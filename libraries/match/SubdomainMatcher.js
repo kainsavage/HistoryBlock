@@ -1,5 +1,9 @@
 class SubdomainMatcher extends Matcher {
 
+  constructor() {
+    super();
+  }
+
   /**
    * Returns the subdomain name of the given URL.
    * Examples: 
@@ -10,7 +14,7 @@ class SubdomainMatcher extends Matcher {
    *        The url for which the subdomain name should be returned.
    */
   match(url) {
-    let domain = url.match(hostRegexp);
+    let domain = url.match(this.hostRegexp);
     domain = domain[0].replace(domain[1], "");
 
     return domain;

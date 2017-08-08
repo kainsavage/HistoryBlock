@@ -2,13 +2,9 @@
  * Contains constants suitable for keys in messaging.
  */
 const ACTION = {
-  // Cookies-related message actions
   ENABLE_BLACKLIST_COOKIES: 'ENABLE_COOKIES',
   DISABLE_BLACKLIST_COOKIES: 'DISABLE_COOKIES',
-
-  // Encrypted-related message actions
   CHANGE_BLACKLIST_ENCRYPTION_TYPE: 'CHANGE_BLACKLIST_ENCRYPTION_TYPE',
-
   BLACKLIST_UPDATED: 'BLACKLIST_UPDATED',
   CLEAR_BLACKLIST: 'CLEAR_BLACKLIST',
   ADD_TO_BLACKLIST: 'ADD_TO_BLACKLIST',

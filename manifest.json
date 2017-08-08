@@ -28,13 +28,13 @@
     "scripts": [
       "libraries/i18n.js",
       "libraries/RuntimeAction.js",
-      "libraries/psl.min.js",
-      "libraries/NoHash.js",
-      "libraries/SHA1.js",
-      "libraries/Matcher.js",
-      "libraries/DomainMatcher.js",
-      "libraries/SubdomainMatcher.js",
-      "libraries/URLMatcher.js",
+      "libraries/hash/NoHash.js",
+      "libraries/hash/SHA1.js",
+      "libraries/match/psl.min.js",
+      "libraries/match/Matcher.js",
+      "libraries/match/DomainMatcher.js",
+      "libraries/match/SubdomainMatcher.js",
+      "libraries/match/URLMatcher.js",
       "libraries/ContextMenu.js",
       "historyblock.js"
     ]

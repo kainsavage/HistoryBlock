@@ -43,10 +43,12 @@ class Options {
       .addEventListener("click", this.addToBlacklist);
     document.querySelector("#removeFromBlacklist")
       .addEventListener("click", this.removeFromBlacklist);
-    document.querySelector("#blacklisttype")
-      .addEventListener("change", this.changeBlacklistType);
-    document.querySelector("#blacklistmatching")
-      .addEventListener("change", this.changeBlacklistMatching);
+    document.querySelectorAll("#blacklisttype > input[type='radio']").forEach(radio => {
+      radio.addEventListener("click", this.changeBlacklistType);
+    });
+    document.querySelectorAll("#blacklistmatching > input[type='radio']").forEach(radio => {
+      radio.addEventListener("click", this.changeBlacklistMatching);
+    });
     document.querySelector("#cookies")
       .addEventListener("click", this.changeCookies);
     document.querySelector("#contextmenu")
@@ -152,14 +154,16 @@ class Options {
    */
   async changeBlacklistType(event) {
     let blacklistType = event.target.value;
-    if (blacklistType === 'none' &&
-      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_TYPE_NONE_CONFIRM_TEXT)) ||
-      blacklistType === 'sha1' &&
-      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_TYPE_SHA1_CONFIRM_TEXT))) {
+    if ((blacklistType === 'none' &&
+      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_TYPE_NONE_CONFIRM_TEXT))) ||
+      (blacklistType === 'sha1' &&
+        confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_TYPE_SHA1_CONFIRM_TEXT)))) {
       await browser.runtime.sendMessage({ action: ACTION.CHANGE_BLACKLIST_ENCRYPTION_TYPE, type: blacklistType });
+      return true;
     }
 
-    await this.renderBlacklistTypeControls();
+    event.preventDefault();
+    return false;
   }
 
   /**
@@ -173,16 +177,18 @@ class Options {
    */
   async changeBlacklistMatching(event) {
     let matching = event.target.value;
-    if (matching === 'domain' &&
-      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_DOMAIN_CONFIRM_TEXT)) ||
-      matching === 'subdomain' &&
-      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_SUBDOMAIN_CONFIRM_TEXT)) ||
-      matching === 'url' &&
-      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_URL_CONFIRM_TEXT))) {
+    if ((matching === 'domain' &&
+      confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_DOMAIN_CONFIRM_TEXT))) ||
+      (matching === 'subdomain' &&
+        confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_SUBDOMAIN_CONFIRM_TEXT))) ||
+      (matching === 'url' &&
+        confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_MATCHING_URL_CONFIRM_TEXT)))) {
       await browser.runtime.sendMessage({ action: ACTION.CHANGE_BLACKLIST_MATCHING, matching: matching });
+      return true;
     }
 
-    await this.renderBlacklistMatchingControls();
+    event.preventDefault();
+    return false;
   }
 
   /**
