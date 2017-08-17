@@ -1,6 +1,7 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: #fbfbfb;
 }
 
 #buttoncontainer {
@@ -30,7 +31,7 @@ row.nounderline {
 
 row name {
   display: inline-block;
-  width: 300px;
+  width: 266px;
 }
 
 ul {
