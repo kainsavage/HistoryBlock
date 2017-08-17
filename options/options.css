@@ -13,6 +13,16 @@ body {
 
 button {
   margin: 0 4px;
+  padding: 0px 20px;
+  background-color: #fbfbfb;
+  border: 1px solid #bbb;
+  color: #333;
+  font-size: 15px;
+  height: 30px;
+}
+
+button:hover {
+  background-color: #ebebeb;
 }
 
 row {
@@ -45,6 +55,97 @@ ul {
   margin: 0 0 10px 0;
 }
 
-inputs > label {
-  padding-right: 12px;
+ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+	overflow: auto;
+}
+
+ul li {
+  position: relative;
+  padding: 4px 0;
+}
+
+ul li input[type=radio] {
+  position: absolute;
+  visibility: hidden;
+}
+
+ul.radios li label {
+  display: block;
+  position: relative;
+  z-index: 9;
+  cursor: pointer;
+  padding-left: 34px;
+  padding-right: 14px;
+}
+
+ul.radios li .check {
+  display: block;
+  position: absolute;
+  border: 1px solid #c1c1c1;
+  border-radius: 100%;
+  height: 24px;
+  width: 24px;
+  top: 0px;
+  left: 0px;
+	z-index: 5;
+}
+
+ul.radios li .check::before {
+  display: block;
+  position: absolute;
+	content: '';
+  border-radius: 100%;
+  height: 12px;
+  width: 12px;
+  top: 5px;
+	left: 5px;
+  margin: auto;
+}
+
+ul.radios li:hover .check {
+  border: 1px solid #2292d0;
+}
+
+ul.radios li input[type=radio]:checked ~ .check::before {
+  background: #2292d0;
+}
+
+ul li input[type=checkbox] {
+  position: absolute;
+  visibility: hidden;
+}
+
+ul.checkboxes li .check {
+  width: 23px;
+  height: 23px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid #c1c1c1;
+}
+
+ul.checkboxes li input[type=checkbox]:checked ~ .check::before {
+  content: '✓';
+  font-size: 15px;
+  padding-left: 5px;
+  color: #2292d0;
+  font-weight: bold;
+}
+
+ul.checkboxes li label {
+  display: block;
+  position: relative;
+  z-index: 9;
+  cursor: pointer;
+  padding-left: 34px;
+  padding-right: 14px;
+}
+
+ul.checkboxes li:hover .check {
+  border: 1px solid #2292d0;
 }

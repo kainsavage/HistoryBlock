@@ -43,10 +43,10 @@ class Options {
       .addEventListener("click", this.addToBlacklist);
     document.querySelector("#removeFromBlacklist")
       .addEventListener("click", this.removeFromBlacklist);
-    document.querySelectorAll("#blacklisttype > input[type='radio']").forEach(radio => {
+    document.querySelectorAll("#blacklisttype > li > input[type='radio']").forEach(radio => {
       radio.addEventListener("click", this.changeBlacklistType);
     });
-    document.querySelectorAll("#blacklistmatching > input[type='radio']").forEach(radio => {
+    document.querySelectorAll("#blacklistmatching > li > input[type='radio']").forEach(radio => {
       radio.addEventListener("click", this.changeBlacklistMatching);
     });
     document.querySelector("#cookies")
