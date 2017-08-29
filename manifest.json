@@ -1,17 +1,19 @@
 {
   "manifest_version": 2,
   "name": "__MSG_EXTENSION_NAME__",
+  "short_name": "__MSG_EXTENSION_NAME__",
   "version": "2.1.0",
   "description": "__MSG_EXTENSION_DESCRIPTION__",
   "author": "kain",
   "developer": {
-    "name": "kain"
+    "name": "kain",
+    "url": "https://www.teamclerks.net/historyblock"
   },
   "default_locale": "en",
   "homepage_url": "https://github.com/kainsavage/HistoryBlock",
   "applications": {
     "gecko": {
-      "id": "historyblock@kain",
+      "id": "historyblock@teamclerks.net",
       "strict_min_version": "55.0"
     }
   },
