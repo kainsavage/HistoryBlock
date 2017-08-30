@@ -28,17 +28,17 @@
   ],
   "background": {
     "scripts": [
-      "libraries/i18n.js",
-      "libraries/RuntimeAction.js",
-      "libraries/hash/NoHash.js",
-      "libraries/hash/SHA1.js",
-      "libraries/match/psl.min.js",
-      "libraries/match/Matcher.js",
-      "libraries/match/DomainMatcher.js",
-      "libraries/match/SubdomainMatcher.js",
-      "libraries/match/URLMatcher.js",
-      "libraries/ContextMenu.js",
-      "historyblock.js"
+      "src/libraries/i18n.js",
+      "src/libraries/RuntimeAction.js",
+      "src/libraries/hash/NoHash.js",
+      "src/libraries/hash/SHA1.js",
+      "src/libraries/match/psl.min.js",
+      "src/libraries/match/Matcher.js",
+      "src/libraries/match/DomainMatcher.js",
+      "src/libraries/match/SubdomainMatcher.js",
+      "src/libraries/match/URLMatcher.js",
+      "src/libraries/ContextMenu.js",
+      "src/historyblock.js"
     ]
   },
   "icons": {
