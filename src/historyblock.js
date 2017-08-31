@@ -43,38 +43,32 @@ class HistoryBlock {
   /**
    * Called whenever a message is sent from another extension (or options page).
    *
-   * @return {Promise}
-   *         A Promise that is fulfilled after the given message has been 
-   *         handled.
+   * @return {boolean}
+   *         Whether this handler successfully handle the message.
    */
   onMessage(message, sender, sendResponse) {
+    switch (message.action) {
+      case ACTION.GET_BLACKLIST:
+        return this.blacklist.list();
+      case ACTION.ADD_TO_BLACKLIST:
+        this.block(message.url);
+      case ACTION.IMPORT_BLACKLIST:
+        this.blacklist.import(message.blacklist);
+      case ACTION.REMOVE_FROM_BLACKLIST:
+        this.unblock(message.url);
+      case ACTION.CLEAR_BLACKLIST:
+        this.blacklist.clear();
+      case ACTION.CHANGE_BLACKLIST_ENCRYPTION_TYPE:
+        this.changeBlacklistEncryption(message.encryptionType).then(() => this.blacklist.clear());
+      case ACTION.CHANGE_BLACKLIST_MATCHING:
+        this.changeBlacklistMatching(message.matching).then(() => this.blacklist.clear());
+      case ACTION.ENABLE_BLACKLIST_COOKIES:
+        this.enableBlacklistCookies();
+      case ACTION.DISABLE_BLACKLIST_COOKIES:
+        this.disableBlacklistCookies();
+    }
 
-    console.log('erm');
-    this.blacklist.list().then(blacklist => console.log(blacklist) && sendResponse(blacklist));
-    return true;
-
-    // switch (message.action) {
-    //   case ACTION.GET_BLACKLIST:
-    //     console.log('erm');
-    //     this.blacklist.list().then(list => console.log(list) && sendResponse(list));
-    //     return true;
-    //   case ACTION.ADD_TO_BLACKLIST:
-    //     return this.block(message.url);
-    //   case ACTION.IMPORT_BLACKLIST:
-    //     return this.blacklist.import(message.blacklist);
-    //   case ACTION.REMOVE_FROM_BLACKLIST:
-    //     return this.unblock(message.url);
-    //   case ACTION.CLEAR_BLACKLIST:
-    //     return this.blacklist.clear();
-    //   case ACTION.CHANGE_BLACKLIST_ENCRYPTION_TYPE:
-    //     return this.changeBlacklistEncryption(message.encryptionType).then(() => this.blacklist.clear());
-    //   case ACTION.CHANGE_BLACKLIST_MATCHING:
-    //     return this.changeBlacklistMatching(message.matching).then(() => this.blacklist.clear());
-    //   case ACTION.ENABLE_BLACKLIST_COOKIES:
-    //     return this.enableBlacklistCookies();
-    //   case ACTION.DISABLE_BLACKLIST_COOKIES:
-    //     return this.disableBlacklistCookies();
-    // }
+    return false;
   }
 
   /**

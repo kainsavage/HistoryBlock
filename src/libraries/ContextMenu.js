@@ -75,15 +75,16 @@ class ContextMenu {
   /**
    * Called whenever a message is sent from another extension (or options page).
    *
-   * @return {Promise}
-   *         A Promise that is fulfilled after the given message has been 
-   *         handled.
+   * @return {boolean}
+   *         Whether this handler successfully handled the message.
    */
-  async onMessage(message) {
+  onMessage(message) {
     switch (message.action) {
       case ACTION.CHANGE_CONTEXT_MENU_CONTROLS:
-        return await this.changeContextMenuControls(message.enabled);
+        this.changeContextMenuControls(message.enabled);
     }
+
+    return false;
   }
 
   /**

@@ -324,8 +324,6 @@ class Options {
   async renderBlacklist() {
     let blacklist = await browser.runtime.sendMessage({ action: ACTION.GET_BLACKLIST });
 
-    console.log(blacklist);
-
     if (blacklist) {
       let el = document.querySelector("#blacklist");
       el.innerHTML = null;
