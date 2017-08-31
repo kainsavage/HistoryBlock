@@ -75,6 +75,8 @@ class ContextMenu {
   /**
    * Called whenever a message is sent from another extension (or options page).
    *
+   * @param  {object} message
+   *         The message sent by the event being fired.
    * @return {boolean}
    *         Whether this handler successfully handled the message.
    */

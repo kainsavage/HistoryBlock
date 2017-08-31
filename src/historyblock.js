@@ -43,10 +43,12 @@ class HistoryBlock {
   /**
    * Called whenever a message is sent from another extension (or options page).
    *
+   * @param  {object} message
+   *         The message sent by the event being fired.
    * @return {boolean}
    *         Whether this handler successfully handle the message.
    */
-  onMessage(message, sender, sendResponse) {
+  onMessage(message) {
     switch (message.action) {
       case ACTION.GET_BLACKLIST:
         return this.blacklist.list();
