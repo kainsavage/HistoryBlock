@@ -1,7 +1,10 @@
 /**
  * A pass-through hasher.
  */
-class NoHash {
+class NoHash extends Hash {
+  constructor() {
+    super();
+  }
 
   /**
    * Returns true - all strings satisfy NoHash's test.
