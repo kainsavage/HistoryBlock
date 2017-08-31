@@ -1,3 +1,6 @@
+/**
+ * Hash interface.
+ */
 class Hash {
 
   /**
@@ -9,9 +12,7 @@ class Hash {
    *         Whether the given string is a valid hash of this type.
    */
   test(str) {
-    // Since this is a superclass implementation, we always return false as we
-    // want no one to actually use this implementation and instead override.
-    return false;
+    throw new Error();
   }
 
   /**
@@ -24,8 +25,6 @@ class Hash {
    *         digested.
    */
   async digest(str) {
-    // Since this is a superclass implementation, we always return null as we
-    // want no one to actually use this implementation and instead override.
-    return null;
+    throw new Error();
   }
 }
