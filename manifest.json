@@ -30,6 +30,9 @@
     "scripts": [
       "src/libraries/i18n.js",
       "src/libraries/RuntimeAction.js",
+      "src/libraries/blacklist/Blacklist.js",
+      "src/libraries/blacklist/SyncStorageBlacklist.js",
+      "src/libraries/hash/Hash.js",
       "src/libraries/hash/NoHash.js",
       "src/libraries/hash/SHA1.js",
       "src/libraries/match/psl.min.js",

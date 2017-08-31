@@ -1,12 +1,13 @@
 /**
  * A lightweight SHA1 library built on top of the browser's crypto object.
  */
-class SHA1 {
+class SHA1 extends Hash {
 
   /**
    * Simple constructor
    */
   constructor() {
+    super();
     this.regexp = /^[0-9A-Fa-f]{40}$/;
     this.encoding = 'utf-8';
     this.cipher = 'SHA-1';

@@ -153,12 +153,12 @@ class Options {
    *         type has been changed.
    */
   async changeBlacklistType(event) {
-    let blacklistType = event.target.value;
-    if ((blacklistType === 'none' &&
+    let encryptionType = event.target.value;
+    if ((encryptionType === 'none' &&
       confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_TYPE_NONE_CONFIRM_TEXT))) ||
-      (blacklistType === 'sha1' &&
+      (encryptionType === 'sha1' &&
         confirm(browser.i18n.getMessage(i18n.CHANGE_BLACKLIST_TYPE_SHA1_CONFIRM_TEXT)))) {
-      await browser.runtime.sendMessage({ action: ACTION.CHANGE_BLACKLIST_ENCRYPTION_TYPE, type: blacklistType });
+      await browser.runtime.sendMessage({ action: ACTION.CHANGE_BLACKLIST_ENCRYPTION_TYPE, encryptionType: encryptionType });
       return true;
     }
 
@@ -322,12 +322,12 @@ class Options {
    *         rendered.
    */
   async renderBlacklist() {
-    let storage = await browser.storage.sync.get();
+    let blacklist = await browser.runtime.sendMessage({ action: ACTION.GET_BLACKLIST });
 
-    if (storage.blacklist) {
+    if (blacklist) {
       let el = document.querySelector("#blacklist");
       el.innerHTML = null;
-      storage.blacklist.forEach(hash => {
+      blacklist.forEach(hash => {
         let li = document.createElement('li');
         li.innerHTML = hash;
         el.appendChild(li);

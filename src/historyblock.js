@@ -10,8 +10,9 @@ class HistoryBlock {
    * components of the HistoryBlock addon.
    */
   constructor() {
-    this.changeBlacklistType();
+    this.changeBlacklistEncryption();
     this.changeBlacklistMatching();
+    this.changeBlacklistType();
     this.createFunctionBindings();
     this.attachEventListeners();
 
@@ -42,31 +43,34 @@ class HistoryBlock {
   /**
    * Called whenever a message is sent from another extension (or options page).
    *
-   * @return {Promise}
-   *         A Promise that is fulfilled after the given message has been 
-   *         handled.
+   * @param  {object} message
+   *         The message sent by the event being fired.
+   * @return {boolean}
+   *         Whether this handler successfully handle the message.
    */
-  async onMessage(message) {
+  onMessage(message) {
     switch (message.action) {
+      case ACTION.GET_BLACKLIST:
+        return this.blacklist.list();
       case ACTION.ADD_TO_BLACKLIST:
-        return this.block(message.url);
+        this.block(message.url);
       case ACTION.IMPORT_BLACKLIST:
-        return this.importBlacklist(message.blacklist);
+        this.blacklist.import(message.blacklist);
       case ACTION.REMOVE_FROM_BLACKLIST:
-        return this.unblock(message.url);
+        this.unblock(message.url);
       case ACTION.CLEAR_BLACKLIST:
-        return this.clearBlacklist();
+        this.blacklist.clear();
       case ACTION.CHANGE_BLACKLIST_ENCRYPTION_TYPE:
-        await this.changeBlacklistType(message.type)
-        return this.clearBlacklist();
+        this.changeBlacklistEncryption(message.encryptionType).then(() => this.blacklist.clear());
       case ACTION.CHANGE_BLACKLIST_MATCHING:
-        await this.changeBlacklistMatching(message.matching);
-        return this.clearBlacklist();
+        this.changeBlacklistMatching(message.matching).then(() => this.blacklist.clear());
       case ACTION.ENABLE_BLACKLIST_COOKIES:
-        return await this.enableBlacklistCookies();
+        this.enableBlacklistCookies();
       case ACTION.DISABLE_BLACKLIST_COOKIES:
-        return await this.disableBlacklistCookies();
+        this.disableBlacklistCookies();
     }
+
+    return false;
   }
 
   /**
@@ -91,7 +95,7 @@ class HistoryBlock {
       let tab = info[0].tab;
       let domain = this.matcher.match(tab.url);
       let hash = await this.hash.digest(domain);
-      let blacklist = await this.getBlacklist();
+      let blacklist = await this.blacklist.list();
 
       if (blacklist.includes(hash)) {
         await browser.sessions.forgetClosedTab(tab.windowId, tab.sessionId);
@@ -123,7 +127,7 @@ class HistoryBlock {
         let tab = info[0].window.tabs[i];
         let domain = this.matcher.match(tab.url);
         let hash = await this.hash.digest(domain);
-        let blacklist = await this.getBlacklist();
+        let blacklist = await this.blacklist.list();
 
         if (blacklist.includes(hash)) {
           containsBlacklistedTab = true;
@@ -152,70 +156,10 @@ class HistoryBlock {
   async onPageVisited(info) {
     let domain = this.matcher.match(info.url);
     let hash = await this.hash.digest(domain);
-    let blacklist = await this.getBlacklist();
+    let blacklist = await this.blacklist.list();
 
     if (blacklist.includes(hash)) {
       await browser.history.deleteUrl({ url: info.url });
-    }
-  }
-
-  /**
-   * Empties out the blacklist.
-   *
-   * @return {Promise}
-   *         A Promise that is fulfilled after the blacklist has been cleared.
-   */
-  async clearBlacklist() {
-    await browser.storage.sync.remove('blacklist');
-
-    // Re-initializes the object.
-    await this.getBlacklist();
-
-    // Purposefully do not wait for this Promise to be fulfilled.
-    browser.runtime.sendMessage({ action: ACTION.BLACKLIST_UPDATED });
-  }
-
-  /**
-   * Retrieves the blacklist from browser storage.
-   *
-   * @return {Promise}
-   *         A Promise that is fulfilled with the value of the blacklist.
-   */
-  async getBlacklist() {
-    let storage = await browser.storage.sync.get();
-
-    if (!storage.blacklist) {
-      await browser.storage.sync.set({ blacklist: [] });
-
-      storage = await browser.storage.sync.get();
-    }
-
-    return storage.blacklist;
-  }
-
-  /**
-   * Attempts to import the list of hashes into the blacklist.
-   *
-   * @return {Promise}
-   *         A Promise that is fulfilled when the given list of hashes have
-   *         been imported into the blacklist.
-   */
-  async importBlacklist(list) {
-    if (list) {
-      let blarr = list.split(',');
-      let blacklist = await this.getBlacklist();
-
-      for (let i = 0; i < blarr.length; i++) {
-        let hash = blarr[i].trim();
-        if (!blacklist.includes(hash) && this.hash.test(hash)) {
-          blacklist.push(hash);
-        }
-      }
-
-      await browser.storage.sync.set({ blacklist: blacklist });
-
-      // Purposefully do not wait for this Promise to be fulfilled.
-      browser.runtime.sendMessage({ action: ACTION.BLACKLIST_UPDATED });
     }
   }
 
@@ -233,7 +177,7 @@ class HistoryBlock {
 
     if (domain) {
       let hash = await this.hash.digest(domain);
-      let blacklist = await this.getBlacklist();
+      let blacklist = await this.blacklist.list();
 
       if (!blacklist.includes(hash)) {
         blacklist.push(hash);
@@ -264,7 +208,7 @@ class HistoryBlock {
 
     if (domain) {
       let hash = await this.hash.digest(domain);
-      let blacklist = await this.getBlacklist();
+      let blacklist = await this.blacklist.list();
 
       if (blacklist.includes(hash)) {
         blacklist.splice(blacklist.indexOf(hash), 1);
@@ -307,34 +251,55 @@ class HistoryBlock {
   }
 
   /**
+   * Changes the type of blacklist to use.
+   * 
+   * @param  {string} blacklistType
+   *         The type of blacklist to use.
+   * @return {Promise}
+   *         A Promise that is fulfilled after blacklist type is potentially
+   *         changed.
+   */
+  async changeBlacklistType(blacklistType) {
+    if (!blacklistType) {
+      blacklistType = await browser.storage.sync.get('blacklistType');
+      blacklistType = blacklistType.blacklistType;
+    }
+
+    if (false) {
+      // Stubbed to always fail.
+      // In the future when there will be additional type(s), this will
+      // be checking against the value of blacklistType
+    }
+    else {
+      this.blacklist = new SyncStorageBlacklist(this.hash);
+    }
+
+    await browser.storage.sync.set({ blacklistType: blacklistType });
+  }
+
+  /**
    * Changes the type of blacklist encryption being used.
    *
-   * @param  {string} type
+   * @param  {string} encryption
    *         The type of blacklist encryption to use.
    * @return {Promise}
    *         A Promise that is fulfilled after the blacklist encryption type
    *         is potentially changed.
    */
-  async changeBlacklistType(type) {
-    let blacklist = await this.getBlacklist();
-
-    if (!type) {
-      type = await browser.storage.sync.get('type');
-      type = type.type;
+  async changeBlacklistEncryption(encryption) {
+    if (!encryption) {
+      encryption = await browser.storage.sync.get('encryption');
+      encryption = encryption.encryption;
     }
 
-    if (type === 'none') {
+    if (encryption === 'none') {
       this.hash = new NoHash();
     }
     else {
       this.hash = new SHA1();
-      // Hash the old non-blocked entry.
-      blacklist.forEach(async (domain) => {
-        await this.block(domain);
-      })
     }
 
-    await browser.storage.sync.set({ type: type });
+    await browser.storage.sync.set({ encryption: encryption });
   }
 
   /**
