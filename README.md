@@ -46,6 +46,20 @@ Example: Blocking `https://www.google.com/` would **only** block visits to `www.
 
 URL matching is the most conservative matching technique and is only suitable for use cases in which only specific URLs need to be blocked, but other visits to the same domain/subdomain should not. URL matching is **not** recommended for most users.
 
+### User Data
+
+#### Cookies
+
+Determines whether cookies should be blocked using the same rules as History entries.
+
+Note: This will cause many websites which store cookies used for authentication to "forget" a logged in user after blocking occurs. For example, if a user has blacklisted a site using this type of cookie-based authentication, visits the site, logs in, closes the tab, then revisits the site, that user will not be logged into that site because the cookie has been removed.
+
+### Controls
+
+#### Context Menu
+
+Controls whether the HistoryBlock context menu (right-click menu) entry is visible.
+
 ### Blacklist
 
 The blacklist as it exists given the current HistoryBlock settings.
