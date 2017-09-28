@@ -329,7 +329,8 @@ class Options {
       el.innerHTML = null;
       blacklist.forEach(hash => {
         let li = document.createElement('li');
-        li.innerHTML = hash;
+        let text = document.createTextNode(hash);
+        li.appendChild(text);
         el.appendChild(li);
       });
     }
