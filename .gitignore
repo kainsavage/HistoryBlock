@@ -1,3 +1,4 @@
 HistoryBlock.xpi
 build.sh
 web-ext-artifacts/*
+.vscode/*
