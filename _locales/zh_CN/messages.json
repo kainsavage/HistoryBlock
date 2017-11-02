@@ -1,0 +1,41 @@
+{
+  "extensionName": {
+    "message": "HistoryBlock"
+  },
+  "extensionDescription": {
+    "message": "湮灭你的足迹"
+  },
+  "block": {
+    "message": "屏蔽"
+  },
+  "unblock": {
+    "message": "解除屏蔽"
+  },
+  "resetBlacklist": {
+    "message": "确定要删除黑名单？（不能撤销）"
+  },
+  "addUrl": {
+    "message": "请输入要加入黑名单的域名或网址（英文逗号分隔多个）。"
+  },
+  "removeUrl": {
+    "message": "请输入要移出黑名单的域名或网址（英文逗号分隔多个）。"
+  },
+  "changeBlacklistTypeNone": {
+    "message": "选择“无”意味着任何打开此页面的人都可以看到黑名单的纯文本内容。此操作也将清空您的黑名单。确定要使用不加密的黑名单吗？"
+  },
+  "changeBlacklistTypeSHA1": {
+    "message": "此操作将完全加密您的黑名单。确定要使用 SHA1 加密你的黑名单吗？（此操作不能撤销）"
+  },
+  "changeMatchingToDomain": {
+    "message": "此操作将清空您的黑名单。确定要将您的黑名单切换为与域名匹配吗？"
+  },
+  "changeMatchingToSubdomain": {
+    "message": "此操作将清空您的黑名单。确定要将您的黑名单切换为与子域名匹配吗？"
+  },
+  "changeMatchingToURL": {
+    "message": "此操作将清空您的黑名单。确定要将您的黑名单切换为与网址匹配吗？"
+  },
+  "importBlacklist": {
+    "message": "请输入以逗号分隔的哈希值列表。"
+  }
+}
