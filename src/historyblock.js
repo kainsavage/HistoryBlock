@@ -89,18 +89,28 @@ class HistoryBlock {
    *         potentially forgotten.
    */
   async onTabRemoved(tabId, removeInfo) {
-    let info = await browser.sessions.getRecentlyClosed({ maxResults: 1 });
+    let info, failSafe = 0;
 
-    if (info[0].tab) {
-      let tab = info[0].tab;
-      let domain = this.matcher.match(tab.url);
-      let hash = await this.hash.digest(domain);
-      let blacklist = await this.blacklist.list();
+    do {
+      info = await browser.sessions.getRecentlyClosed({ maxResults: 1 });
+      failSafe++;
+    }
+    // Because of a race condition, we need to check that our recently closed
+    // tab was actually closed recently (within the last second). If not, we
+    // continuously poll for a more recently closed tab. There is a failsafe
+    // to drop out of this loop in case something goes wrong.
+    while (failSafe < 1000 && Date.now() - info[0].lastModified > 1000) {
+      if (info[0].tab) {
+        let tab = info[0].tab;
+        let domain = this.matcher.match(tab.url);
+        let hash = await this.hash.digest(domain);
+        let blacklist = await this.blacklist.list();
 
-      if (blacklist.includes(hash)) {
-        await browser.sessions.forgetClosedTab(tab.windowId, tab.sessionId);
+        if (blacklist.includes(hash)) {
+          await browser.sessions.forgetClosedTab(tab.windowId, tab.sessionId);
 
-        await this.removeCookies(tab.url);
+          await this.removeCookies(tab.url);
+        }
       }
     }
   }
