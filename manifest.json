@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
-  "version": "2.2",
+  "version": "3.0",
 
   "description": "__MSG_extensionDescription__",
 
@@ -17,7 +17,7 @@
   "applications": {
     "gecko": {
       "id": "historyblock@kain",
-      "strict_min_version": "55.0"
+      "strict_min_version": "58.0"
     }
   },
 
@@ -52,13 +52,5 @@
 
   "options_ui": {
     "page": "options/index.html"
-  },
-
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content-scripts/history-blocker.js"],
-      "run_at": "document_start"
-    }
-  ]
+  }
 }
