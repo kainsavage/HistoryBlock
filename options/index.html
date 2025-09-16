@@ -30,6 +30,15 @@
       <label title="Match the entire URL; example: https://foo.bar.com/baz -> foo.bar.com/baz" for="url">Full URL</label>
     </inputs>
   </row>
+  <row>
+    <name>Context Menu</name>
+    <inputs id="contextmenu">
+      <input type="radio" name="contextmenu" value="enabled" id="contextmenu_enabled" />
+      <label for="contextmenu_enabled">Enabled</label>
+      <input type="radio" name="contextmenu" value="disabled" id="contextmenu_disabled" />
+      <label for="contextmenu_disabled">Disabled</label>
+    </inputs>
+  </row>
   <row class="nounderline">
     <name>Blacklist</name>
   </row>
@@ -41,6 +50,7 @@
     <button id="removeFromBlacklist">Remove Domain</button>
     <button id="addToBlacklist">Add Domain</button>
     <button id="import">Import</button>
+    <button id="export">Export</button>
   </div>
 </body>
 

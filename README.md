@@ -2,6 +2,48 @@
 
 HistoryBlock is a browser extension for maintaining a blacklist of undesirable web addresses which should not be tracked by the history or the recently closed tabs/windows of the browser.
 
+## Building and Deployment
+
+### Prerequisites
+
+Install the `web-ext` command-line tool for building Firefox extensions:
+
+```bash
+npm install --global web-ext
+```
+
+### Building the Extension
+
+To build the extension for distribution:
+
+```bash
+web-ext build
+```
+
+This creates a `.zip` file with the extension name and version from `manifest.json` (e.g., `HistoryBlock-2.0.zip`).
+
+### Custom Build Options
+
+```bash
+web-ext build
+```
+
+### Development Testing
+
+For development and testing, you can run the extension directly:
+
+```bash
+web-ext run
+```
+
+This loads the extension into a temporary Firefox profile for testing.
+
+### Distribution
+
+#### AMO (addons.mozilla.org) Distribution
+1. Build the extension: `web-ext build`
+2. Submit the generated `.zip` file to [addons.mozilla.org](https://addons.mozilla.org)
+
 ## Options Page
 
 ### Blacklist Encryption

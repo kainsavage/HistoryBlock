@@ -12,8 +12,18 @@ class HistoryBlock {
   constructor() {
     this.changeBlacklistType();
     this.changeBlacklistMatching();
-    this.createContextMenuItems();
+    this.initializeContextMenu();
     this.attachEventListeners();
+  }
+
+  /**
+   * Initializes the context menu based on user preference.
+   */
+  async initializeContextMenu() {
+    let storage = await browser.storage.sync.get();
+    if(storage.contextMenu !== 'disabled') {
+      this.createContextMenuItems();
+    }
   }
 
   /**
@@ -31,6 +41,13 @@ class HistoryBlock {
       title: browser.i18n.getMessage('unblock'),
       contexts: ["all"]
     });
+  }
+
+  /**
+   * Removes the HistoryBlock context menu items.
+   */
+  removeContextMenuItems() {
+    browser.contextMenus.removeAll();
   }
 
   /**
@@ -76,6 +93,10 @@ class HistoryBlock {
       case 'changeBlacklistMatching':
         await this.changeBlacklistMatching(message.matching);
         return this.clearBlacklist();
+      case 'changeContextMenu':
+        return this.changeContextMenu(message.contextMenu);
+      case 'changeHistoryBlocker':
+        return this.changeHistoryBlocker(message.historyBlocker);
     }
   }
 
@@ -353,6 +374,48 @@ class HistoryBlock {
     }
 
     await browser.storage.sync.set({matching: matching});
+  }
+
+  /**
+   * Changes the context menu setting.
+   *
+   * @param  {string} contextMenu
+   *         The context menu setting ('enabled' or 'disabled').
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after the context menu setting
+   *         has been changed.
+   */
+  async changeContextMenu(contextMenu) {
+    if(contextMenu === 'enabled') {
+      this.createContextMenuItems();
+    } else {
+      this.removeContextMenuItems();
+    }
+    
+    await browser.storage.sync.set({contextMenu: contextMenu});
+  }
+
+  /**
+   * Changes the history blocker setting.
+   *
+   * @param  {string} historyBlocker
+   *         The history blocker setting ('enabled' or 'disabled').
+   * @return {Promise} promise
+   *         A Promise that is fulfilled after the history blocker setting
+   *         has been changed.
+   */
+  async changeHistoryBlocker(historyBlocker) {
+    const enabled = historyBlocker === 'enabled';
+    await browser.storage.sync.set({historyBlockerEnabled: enabled});
+    
+    // Notify content scripts of the change
+    browser.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        browser.tabs.sendMessage(tab.id, {action: 'historyBlockerSettingsChanged'}).catch(() => {
+          // Ignore errors for tabs that don't have content scripts
+        });
+      });
+    });
   }
 }
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
-  "version": "2.0",
+  "version": "2.2",
 
   "description": "__MSG_extensionDescription__",
 
@@ -52,5 +52,13 @@
 
   "options_ui": {
     "page": "options/index.html"
-  }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-scripts/history-blocker.js"],
+      "run_at": "document_start"
+    }
+  ]
 }

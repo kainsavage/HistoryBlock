@@ -7,6 +7,7 @@ class Options {
 
     this.renderBlacklistType();
     this.renderBlacklistMatching();
+    this.renderContextMenu();
     this.renderBlacklist();
   }
 
@@ -24,8 +25,12 @@ class Options {
       "change", event => this.changeBlacklistType(event.target.value));
     document.querySelector("#blacklistmatching").addEventListener(
       "change", event => this.changeBlacklistMatching(event.target.value));
+    document.querySelector("#contextmenu").addEventListener(
+      "change", event => this.changeContextMenu(event.target.value));
     document.querySelector("#import").addEventListener(
       "click", () => this.importBlacklist() );
+    document.querySelector("#export").addEventListener(
+      "click", () => this.exportBlacklist() );
   }
 
   /**
@@ -95,6 +100,37 @@ class Options {
   }
 
   /**
+   * Exports the current blacklist to the clipboard.
+   * 
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the blacklist has been 
+   *         exported.
+   */
+  async exportBlacklist() {
+    let storage = await browser.storage.sync.get();
+    
+    if(storage.blacklist && storage.blacklist.length > 0) {
+      let blacklistString = storage.blacklist.join(',');
+      
+      try {
+        await navigator.clipboard.writeText(blacklistString);
+        alert('Blacklist exported to clipboard!');
+      } catch (err) {
+        // Fallback for browsers that don't support clipboard API
+        let textArea = document.createElement('textarea');
+        textArea.value = blacklistString;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Blacklist copied to clipboard!');
+      }
+    } else {
+      alert('Blacklist is empty!');
+    }
+  }
+
+  /**
    * Sends a message to have HistoryBlock remove the given URLs from the blacklist.
    *
    * @return {Promise} promise
@@ -157,6 +193,20 @@ class Options {
   }
 
   /**
+   * Sends a message to have HistoryBlock change the context menu setting.
+   *
+   * @param {string} contextMenuSetting
+   *        The context menu setting ('enabled' or 'disabled').
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the context menu setting
+   *         has been changed.
+   */
+  async changeContextMenu(contextMenuSetting) {
+    await browser.runtime.sendMessage({action: 'changeContextMenu', contextMenu: contextMenuSetting});
+    await this.renderContextMenu();
+  }
+
+  /**
    * Renders the blacklist encryption type controls.
    *
    * @return {Promise} promise
@@ -171,10 +221,12 @@ class Options {
     }
 
     if(storage.type === 'none') {
-      document.querySelector("#import").style.visibility = 'hidden';
+      document.querySelector("#import").style.visibility = 'visible';
+      document.querySelector("#export").style.visibility = 'visible';
     }
     else if(storage.type === 'sha1') {
       document.querySelector("#import").style.visibility = 'visible';
+      document.querySelector("#export").style.visibility = 'visible';
     }
 
     let radios = document.querySelectorAll('#blacklisttype input');
@@ -206,6 +258,30 @@ class Options {
     for(let i=0; i<radios.length; i++) {
       let radio = radios[i];
       if(radio.value === storage.matching) {
+        radio.checked = true;
+      }
+    }
+  }
+
+  /**
+   * Renders the context menu controls.
+   *
+   * @return {Promise} promise
+   *         A Promise that will be fulfilled after the context menu elements
+   *         have been rendered.
+   */
+  async renderContextMenu() {
+    let storage = await browser.storage.sync.get();
+
+    if(typeof storage.contextMenu !== 'string') {
+      storage.contextMenu = 'enabled';
+    }
+
+    let radios = document.querySelectorAll('#contextmenu input');
+
+    for(let i=0; i<radios.length; i++) {
+      let radio = radios[i];
+      if(radio.value === storage.contextMenu) {
         radio.checked = true;
       }
     }

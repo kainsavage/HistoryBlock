@@ -13,7 +13,7 @@ body, button {
 #buttoncontainer {
   display:flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding-bottom: 4px;
 }
 
