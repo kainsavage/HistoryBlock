@@ -2,6 +2,8 @@ class URLMatcher extends Matcher {
 
   /**
    * Returns the given URL without query parameters and anchors.
+   * Examples:
+   *   https://www.google.com/search?q=foo#bar -> www.google.com/search
    *
    * @param {string} url
    *        The url to return.
